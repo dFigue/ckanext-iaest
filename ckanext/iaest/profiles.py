@@ -17,7 +17,7 @@ from ckan.plugins import toolkit
 from ckanext.iaest.utils import resource_uri, publisher_uri_from_dataset_dict
 
 DCT = Namespace("http://purl.org/dc/terms/")
-IAEST = Namespace("http://www.w3.org/ns/iaest#")
+DCAT = Namespace("http://www.w3.org/ns/dcat#")
 ADMS = Namespace("http://www.w3.org/ns/adms#")
 VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
 FOAF = Namespace("http://xmlns.com/foaf/0.1/")
@@ -32,7 +32,7 @@ GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+
 
 namespaces = {
     'dct': DCT,
-    'iaest': IAEST,
+    'dcat': DCAT,
     'adms': ADMS,
     'vcard': VCARD,
     'foaf': FOAF,
@@ -58,8 +58,8 @@ class RDFProfile(object):
         Graph is an rdflib.Graph instance.
 
         In compatibility mode, some fields are modified to maintain
-        compatibility with previous versions of the ckanext-iaest parsers
-        (eg adding the `iaest_` prefix or storing comma separated lists instead
+        compatibility with previous versions of the ckanext-dcat parsers
+        (eg adding the `dcat_` prefix or storing comma separated lists instead
         of JSON dumps).
         '''
 
@@ -73,22 +73,22 @@ class RDFProfile(object):
 
     def _datasets(self):
         '''
-        Generator that returns all IAEST datasets on the graph
+        Generator that returns all DCAT datasets on the graph
 
         Yields rdflib.term.URIRef objects that can be used on graph lookups
         and queries
         '''
-        for dataset in self.g.subjects(RDF.type, IAEST.Dataset):
+        for dataset in self.g.subjects(RDF.type, DCAT.Dataset):
             yield dataset
 
     def _distributions(self, dataset):
         '''
-        Generator that returns all IAEST distributions on a particular dataset
+        Generator that returns all DCAT distributions on a particular dataset
 
         Yields rdflib.term.URIRef objects that can be used on graph lookups
         and queries
         '''
-        for distribution in self.g.objects(dataset, IAEST.distribution):
+        for distribution in self.g.objects(dataset, DCAT.distribution):
             yield distribution
 
     def _object(self, subject, predicate):
@@ -272,7 +272,7 @@ class RDFProfile(object):
 
         Check the notes on the README for the supported formats:
 
-        https://github.com/ckan/ckanext-iaest/#rdf-iaest-to-ckan-dataset-mapping
+        https://github.com/ckan/ckanext-dcat/#rdf-dcat-to-ckan-dataset-mapping
         '''
 
         uri = None
@@ -349,13 +349,13 @@ class RDFProfile(object):
         '''
         Returns the Internet Media Type and format label for a distribution
 
-        Given a reference (URIRef or BNode) to a iaest:Distribution, it will
+        Given a reference (URIRef or BNode) to a dcat:Distribution, it will
         try to extract the media type (previously knowm as MIME type), eg
         `text/csv`, and the format label, eg `CSV`
 
         Values for the media type will be checked in the following order:
 
-        1. literal value of iaest:mediaType
+        1. literal value of dcat:mediaType
         2. literal value of dct:format if it contains a '/' character
         3. value of dct:format if it is an instance of dct:IMT, eg:
 
@@ -383,7 +383,7 @@ class RDFProfile(object):
         imt = None
         label = None
 
-        imt = self._object_value(distribution, IAEST.mediaType)
+        imt = self._object_value(distribution, DCAT.mediaType)
 
         _format = self._object(distribution, DCT['format'])
         if isinstance(_format, Literal):
@@ -416,7 +416,7 @@ class RDFProfile(object):
         Returns the value for the given key on a CKAN dict
 
         By default a key on the root level is checked. If not found, extras
-        are checked, both with the key provided and with `iaest_` prepended to
+        are checked, both with the key provided and with `dcat_` prepended to
         support legacy fields.
 
         If not found, returns the default value, which defaults to None
@@ -426,7 +426,7 @@ class RDFProfile(object):
             return _dict[key]
 
         for extra in _dict.get('extras', []):
-            if extra['key'] == key or extra['key'] == 'iaest_' + key:
+            if extra['key'] == key or extra['key'] == 'dcat_' + key:
                 return extra['value']
 
         return default
@@ -594,7 +594,7 @@ class RDFProfile(object):
         this method
 
         `catalog_dict` is a dict that can contain literal values for the
-        iaest:Catalog class like `title`, `homepage`, etc. `catalog_ref` is an
+        dcat:Catalog class like `title`, `homepage`, etc. `catalog_ref` is an
         rdflib URIRef object that must be used to reference the catalog when
         working with the graph.
         '''
@@ -616,11 +616,11 @@ class RDFProfile(object):
 
 class EuropeanIAESTAPProfile(RDFProfile):
     '''
-    An RDF profile based on the IAEST-AP for data portals in Europe
+    An RDF profile based on the DCAT-AP for data portals in Europe
 
     More information and specification:
 
-    https://joinup.ec.europa.eu/asset/iaest_application_profile
+    https://joinup.ec.europa.eu/asset/dcat_application_profile
 
     '''
 
@@ -634,7 +634,7 @@ class EuropeanIAESTAPProfile(RDFProfile):
         for key, predicate in (
                 ('title', DCT.title),
                 ('notes', DCT.description),
-                ('url', IAEST.landingPage),
+                ('url', DCAT.landingPage),
                 ('version', OWL.versionInfo),
                 ):
             value = self._object_value(dataset_ref, predicate)
@@ -642,13 +642,13 @@ class EuropeanIAESTAPProfile(RDFProfile):
                 dataset_dict[key] = value
 
         if not dataset_dict.get('version'):
-            # adms:version was supported on the first version of the IAEST-AP
+            # adms:version was supported on the first version of the DCAT-AP
             value = self._object_value(dataset_ref, ADMS.version)
             if value:
                 dataset_dict['version'] = value
 
         # Tags
-        keywords = self._object_value_list(dataset_ref, IAEST.keyword) or []
+        keywords = self._object_value_list(dataset_ref, DCAT.keyword) or []
         # Split keywords with commas
         keywords_with_commas = [k for k in keywords if ',' in k]
         for keyword in keywords_with_commas:
@@ -669,7 +669,7 @@ class EuropeanIAESTAPProfile(RDFProfile):
                 ('frequency', DCT.accrualPeriodicity),
                 ('access_rights', DCT.accessRights),
                 ('provenance', DCT.provenance),
-                ('iaest_type', DCT.type),
+                ('dcat_type', DCT.type),
                 ):
             value = self._object_value(dataset_ref, predicate)
             if value:
@@ -678,7 +678,7 @@ class EuropeanIAESTAPProfile(RDFProfile):
         #  Lists
         for key, predicate, in (
                 ('language', DCT.language),
-                ('theme', IAEST.theme),
+                ('theme', DCAT.theme),
                 ('alternate_identifier', ADMS.identifier),
                 ('conforms_to', DCT.conformsTo),
                 ('documentation', FOAF.page),
@@ -694,9 +694,9 @@ class EuropeanIAESTAPProfile(RDFProfile):
                                                'value': json.dumps(values)})
 
         # Contact details
-        contact = self._contact_details(dataset_ref, IAEST.contactPoint)
+        contact = self._contact_details(dataset_ref, DCAT.contactPoint)
         if not contact:
-            # adms:contactPoint was supported on the first version of IAEST-AP
+            # adms:contactPoint was supported on the first version of DCAT-AP
             contact = self._contact_details(dataset_ref, ADMS.contactPoint)
 
         if contact:
@@ -750,7 +750,7 @@ class EuropeanIAESTAPProfile(RDFProfile):
             for key, predicate in (
                     ('name', DCT.title),
                     ('description', DCT.description),
-                    ('download_url', IAEST.downloadURL),
+                    ('download_url', DCAT.downloadURL),
                     ('issued', DCT.issued),
                     ('modified', DCT.modified),
                     ('status', ADMS.status),
@@ -762,9 +762,9 @@ class EuropeanIAESTAPProfile(RDFProfile):
                     resource_dict[key] = value
 
             resource_dict['url'] = (self._object_value(distribution,
-                                                       IAEST.accessURL) or
+                                                       DCAT.accessURL) or
                                     self._object_value(distribution,
-                                                       IAEST.downloadURL))
+                                                       DCAT.downloadURL))
             #  Lists
             for key, predicate in (
                     ('language', DCT.language),
@@ -790,7 +790,7 @@ class EuropeanIAESTAPProfile(RDFProfile):
                 resource_dict['format'] = imt
 
             # Size
-            size = self._object_value_int(distribution, IAEST.byteSize)
+            size = self._object_value_int(distribution, DCAT.byteSize)
             if size is not None:
                 resource_dict['size'] = size
 
@@ -813,12 +813,12 @@ class EuropeanIAESTAPProfile(RDFProfile):
 
         if self.compatibility_mode:
             # Tweak the resulting dict to make it compatible with previous
-            # versions of the ckanext-iaest parsers
+            # versions of the ckanext-dcat parsers
             for extra in dataset_dict['extras']:
                 if extra['key'] in ('issued', 'modified', 'publisher_name',
                                     'publisher_email',):
 
-                    extra['key'] = 'iaest_' + extra['key']
+                    extra['key'] = 'dcat_' + extra['key']
 
                 if extra['key'] == 'language':
                     extra['value'] = ','.join(
@@ -833,26 +833,26 @@ class EuropeanIAESTAPProfile(RDFProfile):
         for prefix, namespace in namespaces.iteritems():
             g.bind(prefix, namespace)
 
-        g.add((dataset_ref, RDF.type, IAEST.Dataset))
+        g.add((dataset_ref, RDF.type, DCAT.Dataset))
 
         # Basic fields
         items = [
             ('title', DCT.title, None, Literal),
             ('notes', DCT.description, None, Literal),
-            ('url', IAEST.landingPage, None, URIRef),
+            ('url', DCAT.landingPage, None, URIRef),
             ('identifier', DCT.identifier, ['guid', 'id'], Literal),
-            ('version', OWL.versionInfo, ['iaest_version'], Literal),
+            ('version', OWL.versionInfo, ['dcat_version'], Literal),
             ('version_notes', ADMS.versionNotes, None, Literal),
             ('frequency', DCT.accrualPeriodicity, None, Literal),
             ('access_rights', DCT.accessRights, None, Literal),
-            ('iaest_type', DCT.type, None, Literal),
+            ('dcat_type', DCT.type, None, Literal),
             ('provenance', DCT.provenance, None, Literal),
         ]
         self._add_triples_from_dict(dataset_dict, dataset_ref, items)
 
         # Tags
         for tag in dataset_dict.get('tags', []):
-            g.add((dataset_ref, IAEST.keyword, Literal(tag['name'])))
+            g.add((dataset_ref, DCAT.keyword, Literal(tag['name'])))
 
         # Dates
         items = [
@@ -864,7 +864,7 @@ class EuropeanIAESTAPProfile(RDFProfile):
         #  Lists
         items = [
             ('language', DCT.language, None, Literal),
-            ('theme', IAEST.theme, None, URIRef),
+            ('theme', DCAT.theme, None, URIRef),
             ('conforms_to', DCT.conformsTo, None, Literal),
             ('alternate_identifier', ADMS.identifier, None, Literal),
             ('documentation', FOAF.page, None, Literal),
@@ -894,7 +894,7 @@ class EuropeanIAESTAPProfile(RDFProfile):
                 contact_details = BNode()
 
             g.add((contact_details, RDF.type, VCARD.Organization))
-            g.add((dataset_ref, IAEST.contactPoint, contact_details))
+            g.add((dataset_ref, DCAT.contactPoint, contact_details))
 
             items = [
                 ('contact_name', VCARD.fn, ['maintainer', 'author'], Literal),
@@ -973,7 +973,7 @@ class EuropeanIAESTAPProfile(RDFProfile):
                 g.add((spatial_ref,
                        LOCN.geometry,
                        Literal(spatial_geom, datatype=GEOJSON_IMT)))
-                # WKT, because GeoIAEST-AP says so
+                # WKT, because GeoDCAT-AP says so
                 try:
                     g.add((spatial_ref,
                            LOCN.geometry,
@@ -988,9 +988,9 @@ class EuropeanIAESTAPProfile(RDFProfile):
 
             distribution = URIRef(resource_uri(resource_dict))
 
-            g.add((dataset_ref, IAEST.distribution, distribution))
+            g.add((dataset_ref, DCAT.distribution, distribution))
 
-            g.add((distribution, RDF.type, IAEST.Distribution))
+            g.add((distribution, RDF.type, DCAT.Distribution))
 
             #  Simple values
             items = [
@@ -1013,7 +1013,7 @@ class EuropeanIAESTAPProfile(RDFProfile):
 
             # Format
             if '/' in resource_dict.get('format', ''):
-                g.add((distribution, IAEST.mediaType,
+                g.add((distribution, DCAT.mediaType,
                        Literal(resource_dict['format'])))
             else:
                 if resource_dict.get('format'):
@@ -1021,16 +1021,16 @@ class EuropeanIAESTAPProfile(RDFProfile):
                            Literal(resource_dict['format'])))
 
                 if resource_dict.get('mimetype'):
-                    g.add((distribution, IAEST.mediaType,
+                    g.add((distribution, DCAT.mediaType,
                            Literal(resource_dict['mimetype'])))
 
             # URL
             url = resource_dict.get('url')
             download_url = resource_dict.get('download_url')
             if download_url:
-                g.add((distribution, IAEST.downloadURL, URIRef(download_url)))
+                g.add((distribution, DCAT.downloadURL, URIRef(download_url)))
             if (url and not download_url) or (url and url != download_url):
-                g.add((distribution, IAEST.accessURL, URIRef(url)))
+                g.add((distribution, DCAT.accessURL, URIRef(url)))
 
             # Dates
             items = [
@@ -1043,11 +1043,11 @@ class EuropeanIAESTAPProfile(RDFProfile):
             # Numbers
             if resource_dict.get('size'):
                 try:
-                    g.add((distribution, IAEST.byteSize,
+                    g.add((distribution, DCAT.byteSize,
                            Literal(float(resource_dict['size']),
                                    datatype=XSD.decimal)))
                 except (ValueError, TypeError):
-                    g.add((distribution, IAEST.byteSize,
+                    g.add((distribution, DCAT.byteSize,
                            Literal(resource_dict['size'])))
             # Checksum
             if resource_dict.get('hash'):
@@ -1072,7 +1072,7 @@ class EuropeanIAESTAPProfile(RDFProfile):
         for prefix, namespace in namespaces.iteritems():
             g.bind(prefix, namespace)
 
-        g.add((catalog_ref, RDF.type, IAEST.Catalog))
+        g.add((catalog_ref, RDF.type, DCAT.Catalog))
 
         # Basic fields
         items = [
