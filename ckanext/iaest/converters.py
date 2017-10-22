@@ -102,6 +102,7 @@ def ckan_to_iaest(package_dict):
             'byteSize': resource.get('size'),
             # TODO: downloadURL or accessURL depending on resource type?
             'accessURL': resource.get('url'),
+            'license':'cc-by-4.0'
         }
         iaest_dict['distribution'].append(distribution)
 
