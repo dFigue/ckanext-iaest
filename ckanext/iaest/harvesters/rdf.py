@@ -56,7 +56,7 @@ class IAESTRDFHarvester(IAESTHarvester):
                 return extra['value']
 
         for extra in dataset_dict.get('extras', []):
-            if extra['key'] == 'iaest_identifier' and extra['value']:
+            if extra['key'] == 'dcat_identifier' and extra['value']:
                 return extra['value']
 
         if dataset_dict.get('name'):

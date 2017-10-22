@@ -13,11 +13,11 @@ from rdflib.namespace import Namespace, RDF
 
 import ckan.plugins as p
 
-from ckanext.iaest.utils import catalog_uri, dataset_uri, url_to_rdflib_format
+from ckanext.dcat.utils import catalog_uri, dataset_uri, url_to_rdflib_format
 
 
 HYDRA = Namespace('http://www.w3.org/ns/hydra/core#')
-IAEST = Namespace("http://www.w3.org/ns/iaest#")
+DCAT = Namespace("http://www.w3.org/ns/dcat#")
 
 RDF_PROFILES_ENTRY_POINT_GROUP = 'ckan.rdf.profiles'
 RDF_PROFILES_CONFIG_OPTION = 'ckanext.iaest.rdf.profiles'
@@ -106,12 +106,12 @@ class RDFParser(RDFProcessor):
 
     def _datasets(self):
         '''
-        Generator that returns all IAEST datasets on the graph
+        Generator that returns all DCAT datasets on the graph
 
         Yields rdflib.term.URIRef objects that can be used on graph lookups
         and queries
         '''
-        for dataset in self.g.subjects(RDF.type, IAEST.Dataset):
+        for dataset in self.g.subjects(RDF.type, DCAT.Dataset):
             yield dataset
 
     def next_page(self):
@@ -320,7 +320,7 @@ class RDFSerializer(RDFProcessor):
             for dataset_dict in dataset_dicts:
                 dataset_ref = self.graph_from_dataset(dataset_dict)
 
-                self.g.add((catalog_ref, IAEST.dataset, dataset_ref))
+                self.g.add((catalog_ref, DCAT.dataset, dataset_ref))
 
         if pagination_info:
             self._add_pagination_triples(pagination_info)
