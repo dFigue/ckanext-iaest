@@ -1,0 +1,53 @@
+import json
+import logging
+from hashlib import sha1
+
+from ckanext.iaest import converters
+from ckanext.iaest.harvesters.base import IAESTHarvester
+
+log = logging.getLogger(__name__)
+
+
+class IAESTJSONHarvester(IAESTHarvester):
+
+    def info(self):
+        return {
+            'name': 'iaest_json',
+            'title': 'IAEST JSON Harvester',
+            'description': 'Harvester for IAEST dataset descriptions ' +
+                           'serialized as JSON'
+        }
+
+    def _get_guids_and_datasets(self, content):
+
+        doc = json.loads(content)
+
+        if isinstance(doc, list):
+            # Assume a list of datasets
+            datasets = doc
+        elif isinstance(doc, dict):
+            datasets = doc.get('dataset', [])
+        else:
+            raise ValueError('Wrong JSON object')
+
+        for dataset in datasets:
+
+            as_string = json.dumps(dataset)
+
+            # Get identifier
+            guid = dataset.get('identifier')
+            if not guid:
+                # This is bad, any ideas welcomed
+                guid = sha1(as_string).hexdigest()
+
+            yield guid, as_string
+
+    def _get_package_dict(self, harvest_object):
+
+        content = harvest_object.content
+
+        iaest_dict = json.loads(content)
+
+        package_dict = converters.iaest_to_ckan(iaest_dict)
+
+        return package_dict, iaest_dict
