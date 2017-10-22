@@ -4,6 +4,7 @@ Extension of https://github.com/ckan/ckanext-dcat
 
 Installation
 
+. /usr/lib/ckan/default/bin/activate
 
 Install ckanext-harvest (https://github.com/ckan/ckanext-harvest#installation) (Only if you want to use the RDF harvester)
 
@@ -16,3 +17,5 @@ Install the extension requirements:
 Enable the required plugins in your ini file:
 
 ckan.plugins = dcat dcat_rdf_harvester dcat_json_harvester dcat_json_interface
+
+URLs
