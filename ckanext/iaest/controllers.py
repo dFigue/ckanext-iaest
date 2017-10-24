@@ -9,7 +9,7 @@ else:
 from ckan.controllers.package import PackageController
 from ckan.controllers.home import HomeController
 
-from ckanext.iaest.utils import CONTENT_TYPES, parse_accept_header
+from ckanext.dcat.utils import CONTENT_TYPES, parse_accept_header
 
 
 def check_access_header():
@@ -22,7 +22,7 @@ def check_access_header():
     return _format
 
 
-class IAESTController(BaseController):
+class DCATController(BaseController):
 
     def read_catalog(self, _format=None):
 
@@ -41,7 +41,7 @@ class IAESTController(BaseController):
         toolkit.response.headers.update(
             {'Content-type': CONTENT_TYPES[_format]})
         try:
-            return toolkit.get_action('iaest_catalog_show')({}, data_dict)
+            return toolkit.get_action('dcat_catalog_show')({}, data_dict)
         except toolkit.ValidationError, e:
             toolkit.abort(409, str(e))
 
@@ -57,14 +57,14 @@ class IAESTController(BaseController):
             {'Content-type': CONTENT_TYPES[_format]})
 
         try:
-            result = toolkit.get_action('iaest_dataset_show')({}, {'id': _id,
+            result = toolkit.get_action('dcat_dataset_show')({}, {'id': _id,
                 'format': _format})
         except toolkit.ObjectNotFound:
             toolkit.abort(404)
 
         return result
 
-    def iaest_json(self):
+    def dcat_json(self):
 
         data_dict = {
             'page': toolkit.request.params.get('page'),
@@ -72,7 +72,7 @@ class IAESTController(BaseController):
         }
 
         try:
-            datasets = toolkit.get_action('iaest_datasets_list')({},
+            datasets = toolkit.get_action('dcat_datasets_list')({},
                                                                 data_dict)
         except toolkit.ValidationError, e:
             toolkit.abort(409, str(e))

@@ -14,7 +14,7 @@ from geomet import wkt, InvalidGeoJSONException
 from ckan.model.license import LicenseRegister
 from ckan.plugins import toolkit
 
-from ckanext.iaest.utils import resource_uri, publisher_uri_from_dataset_dict
+from ckanext.dcat.utils import resource_uri, publisher_uri_from_dataset_dict
 
 DCT = Namespace("http://purl.org/dc/terms/")
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
@@ -614,7 +614,7 @@ class RDFProfile(object):
         pass
 
 
-class EuropeanIAESTAPProfile(RDFProfile):
+class EuropeanDCATAPProfile(RDFProfile):
     '''
     An RDF profile based on the DCAT-AP for data portals in Europe
 
@@ -777,7 +777,7 @@ class EuropeanIAESTAPProfile(RDFProfile):
 
             # Format and media type
             normalize_ckan_format = config.get(
-                'ckanext.iaest.normalize_ckan_format', True)
+                'ckanext.dcat.normalize_ckan_format', True)
             imt, label = self._distribution_format(distribution,
                                                    normalize_ckan_format)
 

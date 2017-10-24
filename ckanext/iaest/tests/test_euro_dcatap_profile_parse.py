@@ -13,8 +13,8 @@ try:
 except ImportError:
     from ckan.new_tests import helpers
 
-from ckanext.iaest.processors import RDFParser
-from ckanext.iaest.profiles import (IAEST, DCT, ADMS, LOCN, SKOS, GSP, RDFS,
+from ckanext.dcat.processors import RDFParser
+from ckanext.dcat.profiles import (DCAT, DCT, ADMS, LOCN, SKOS, GSP, RDFS,
                                    GEOJSON_IMT)
 
 eq_ = nose.tools.eq_
@@ -37,13 +37,13 @@ class BaseParseTest(object):
             return f.read()
 
 
-class TestEuroIAESTAPProfileParsing(BaseParseTest):
+class TestEuroDCATAPProfileParsing(BaseParseTest):
 
     def test_dataset_all_fields(self):
 
         contents = self._get_file_contents('dataset.rdf')
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.parse(contents)
 
@@ -94,7 +94,7 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         eq_(_get_extra_value('contact_email'), 'mailto:contact@some.org')
         eq_(_get_extra_value('access_rights'), 'public')
         eq_(_get_extra_value('provenance'), 'Some statement about provenance')
-        eq_(_get_extra_value('iaest_type'), 'test-type')
+        eq_(_get_extra_value('dcat_type'), 'test-type')
 
         #  Lists
         eq_(sorted(_get_extra_value_as_list('language')), [u'ca', u'en', u'es'])
@@ -160,11 +160,11 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         g = Graph()
 
         dataset1 = URIRef("http://example.org/datasets/1")
-        g.add((dataset1, RDF.type, IAEST.Dataset))
+        g.add((dataset1, RDF.type, DCAT.Dataset))
 
         g.add((dataset1, ADMS.version, Literal('2.3a')))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -173,19 +173,19 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         eq_(dataset['version'], u'2.3a')
 
     def test_dataset_license_from_distribution_by_uri(self):
-        # license_id retrieved from the URI of iaest:license object
+        # license_id retrieved from the URI of dcat:license object
         g = Graph()
 
         dataset = URIRef("http://example.org/datasets/1")
-        g.add((dataset, RDF.type, IAEST.Dataset))
+        g.add((dataset, RDF.type, DCAT.Dataset))
 
         distribution = URIRef("http://example.org/datasets/1/ds/1")
-        g.add((dataset, IAEST.distribution, distribution))
-        g.add((distribution, RDF.type, IAEST.Distribution))
+        g.add((dataset, DCAT.distribution, distribution))
+        g.add((distribution, RDF.type, DCAT.Distribution))
         g.add((distribution, DCT.license,
                URIRef("http://www.opendefinition.org/licenses/cc-by")))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -193,20 +193,20 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         eq_(dataset['license_id'], 'cc-by')
 
     def test_dataset_license_from_distribution_by_title(self):
-        # license_id retrieved from dct:title of iaest:license object
+        # license_id retrieved from dct:title of dcat:license object
         g = Graph()
 
         dataset = URIRef("http://example.org/datasets/1")
-        g.add((dataset, RDF.type, IAEST.Dataset))
+        g.add((dataset, RDF.type, DCAT.Dataset))
 
         distribution = URIRef("http://example.org/datasets/1/ds/1")
-        g.add((distribution, RDF.type, IAEST.Distribution))
-        g.add((dataset, IAEST.distribution, distribution))
+        g.add((distribution, RDF.type, DCAT.Distribution))
+        g.add((dataset, DCAT.distribution, distribution))
         license = BNode()
         g.add((distribution, DCT.license, license))
         g.add((license, DCT.title, Literal("Creative Commons Attribution")))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -217,14 +217,14 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         g = Graph()
 
         dataset1 = URIRef("http://example.org/datasets/1")
-        g.add((dataset1, RDF.type, IAEST.Dataset))
+        g.add((dataset1, RDF.type, DCAT.Dataset))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
-        g.add((distribution1_1, RDF.type, IAEST.Distribution))
-        g.add((distribution1_1, IAEST.accessURL, Literal('http://access.url.org')))
-        g.add((dataset1, IAEST.distribution, distribution1_1))
+        g.add((distribution1_1, RDF.type, DCAT.Distribution))
+        g.add((distribution1_1, DCAT.accessURL, Literal('http://access.url.org')))
+        g.add((dataset1, DCAT.distribution, distribution1_1))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -239,14 +239,14 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         g = Graph()
 
         dataset1 = URIRef("http://example.org/datasets/1")
-        g.add((dataset1, RDF.type, IAEST.Dataset))
+        g.add((dataset1, RDF.type, DCAT.Dataset))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
-        g.add((distribution1_1, RDF.type, IAEST.Distribution))
-        g.add((distribution1_1, IAEST.downloadURL, Literal('http://download.url.org')))
-        g.add((dataset1, IAEST.distribution, distribution1_1))
+        g.add((distribution1_1, RDF.type, DCAT.Distribution))
+        g.add((distribution1_1, DCAT.downloadURL, Literal('http://download.url.org')))
+        g.add((dataset1, DCAT.distribution, distribution1_1))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -261,15 +261,15 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         g = Graph()
 
         dataset1 = URIRef("http://example.org/datasets/1")
-        g.add((dataset1, RDF.type, IAEST.Dataset))
+        g.add((dataset1, RDF.type, DCAT.Dataset))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
-        g.add((distribution1_1, RDF.type, IAEST.Distribution))
-        g.add((distribution1_1, IAEST.accessURL, Literal('http://access.url.org')))
-        g.add((distribution1_1, IAEST.downloadURL, Literal('http://download.url.org')))
-        g.add((dataset1, IAEST.distribution, distribution1_1))
+        g.add((distribution1_1, RDF.type, DCAT.Distribution))
+        g.add((distribution1_1, DCAT.accessURL, Literal('http://access.url.org')))
+        g.add((distribution1_1, DCAT.downloadURL, Literal('http://download.url.org')))
+        g.add((dataset1, DCAT.distribution, distribution1_1))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -284,15 +284,15 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         g = Graph()
 
         dataset1 = URIRef("http://example.org/datasets/1")
-        g.add((dataset1, RDF.type, IAEST.Dataset))
+        g.add((dataset1, RDF.type, DCAT.Dataset))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
-        g.add((distribution1_1, RDF.type, IAEST.Distribution))
-        g.add((distribution1_1, IAEST.mediaType, Literal('text/csv')))
+        g.add((distribution1_1, RDF.type, DCAT.Distribution))
+        g.add((distribution1_1, DCAT.mediaType, Literal('text/csv')))
         g.add((distribution1_1, DCT['format'], Literal('CSV')))
-        g.add((dataset1, IAEST.distribution, distribution1_1))
+        g.add((dataset1, DCAT.distribution, distribution1_1))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -307,14 +307,14 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         g = Graph()
 
         dataset1 = URIRef("http://example.org/datasets/1")
-        g.add((dataset1, RDF.type, IAEST.Dataset))
+        g.add((dataset1, RDF.type, DCAT.Dataset))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
-        g.add((distribution1_1, RDF.type, IAEST.Distribution))
+        g.add((distribution1_1, RDF.type, DCAT.Distribution))
         g.add((distribution1_1, DCT['format'], Literal('CSV')))
-        g.add((dataset1, IAEST.distribution, distribution1_1))
+        g.add((dataset1, DCAT.distribution, distribution1_1))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -328,14 +328,14 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         g = Graph()
 
         dataset1 = URIRef("http://example.org/datasets/1")
-        g.add((dataset1, RDF.type, IAEST.Dataset))
+        g.add((dataset1, RDF.type, DCAT.Dataset))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
-        g.add((distribution1_1, RDF.type, IAEST.Distribution))
-        g.add((distribution1_1, IAEST.mediaType, Literal('text/csv')))
-        g.add((dataset1, IAEST.distribution, distribution1_1))
+        g.add((distribution1_1, RDF.type, DCAT.Distribution))
+        g.add((distribution1_1, DCAT.mediaType, Literal('text/csv')))
+        g.add((dataset1, DCAT.distribution, distribution1_1))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -348,19 +348,19 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         else:
             eq_(resource['format'], u'text/csv')
 
-    @helpers.change_config('ckanext.iaest.normalize_ckan_format', False)
+    @helpers.change_config('ckanext.dcat.normalize_ckan_format', False)
     def test_distribution_format_imt_only_normalize_false(self):
         g = Graph()
 
         dataset1 = URIRef("http://example.org/datasets/1")
-        g.add((dataset1, RDF.type, IAEST.Dataset))
+        g.add((dataset1, RDF.type, DCAT.Dataset))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
-        g.add((distribution1_1, RDF.type, IAEST.Distribution))
-        g.add((distribution1_1, IAEST.mediaType, Literal('text/csv')))
-        g.add((dataset1, IAEST.distribution, distribution1_1))
+        g.add((distribution1_1, RDF.type, DCAT.Distribution))
+        g.add((distribution1_1, DCAT.mediaType, Literal('text/csv')))
+        g.add((dataset1, DCAT.distribution, distribution1_1))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -371,19 +371,19 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         eq_(resource['format'], u'text/csv')
         eq_(resource['mimetype'], u'text/csv')
 
-    @helpers.change_config('ckanext.iaest.normalize_ckan_format', False)
+    @helpers.change_config('ckanext.dcat.normalize_ckan_format', False)
     def test_distribution_format_format_only_normalize_false(self):
         g = Graph()
 
         dataset1 = URIRef("http://example.org/datasets/1")
-        g.add((dataset1, RDF.type, IAEST.Dataset))
+        g.add((dataset1, RDF.type, DCAT.Dataset))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
-        g.add((distribution1_1, RDF.type, IAEST.Distribution))
+        g.add((distribution1_1, RDF.type, DCAT.Distribution))
         g.add((distribution1_1, DCT['format'], Literal('CSV')))
-        g.add((dataset1, IAEST.distribution, distribution1_1))
+        g.add((dataset1, DCAT.distribution, distribution1_1))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -398,14 +398,14 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         g = Graph()
 
         dataset1 = URIRef("http://example.org/datasets/1")
-        g.add((dataset1, RDF.type, IAEST.Dataset))
+        g.add((dataset1, RDF.type, DCAT.Dataset))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
-        g.add((distribution1_1, RDF.type, IAEST.Distribution))
-        g.add((distribution1_1, IAEST.mediaType, Literal('text/unknown-imt')))
-        g.add((dataset1, IAEST.distribution, distribution1_1))
+        g.add((distribution1_1, RDF.type, DCAT.Distribution))
+        g.add((distribution1_1, DCAT.mediaType, Literal('text/unknown-imt')))
+        g.add((dataset1, DCAT.distribution, distribution1_1))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -420,14 +420,14 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         g = Graph()
 
         dataset1 = URIRef("http://example.org/datasets/1")
-        g.add((dataset1, RDF.type, IAEST.Dataset))
+        g.add((dataset1, RDF.type, DCAT.Dataset))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
-        g.add((distribution1_1, RDF.type, IAEST.Distribution))
-        g.add((distribution1_1, IAEST.mediaType, Literal('text/unknown-imt')))
-        g.add((dataset1, IAEST.distribution, distribution1_1))
+        g.add((distribution1_1, RDF.type, DCAT.Distribution))
+        g.add((distribution1_1, DCAT.mediaType, Literal('text/unknown-imt')))
+        g.add((dataset1, DCAT.distribution, distribution1_1))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -442,15 +442,15 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         g = Graph()
 
         dataset1 = URIRef("http://example.org/datasets/1")
-        g.add((dataset1, RDF.type, IAEST.Dataset))
+        g.add((dataset1, RDF.type, DCAT.Dataset))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
-        g.add((distribution1_1, RDF.type, IAEST.Distribution))
-        g.add((distribution1_1, IAEST.mediaType, Literal('text/csv')))
+        g.add((distribution1_1, RDF.type, DCAT.Distribution))
+        g.add((distribution1_1, DCAT.mediaType, Literal('text/csv')))
         g.add((distribution1_1, DCT['format'], Literal('Comma Separated Values')))
-        g.add((dataset1, IAEST.distribution, distribution1_1))
+        g.add((dataset1, DCAT.distribution, distribution1_1))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -468,7 +468,7 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         g = Graph()
 
         dataset1 = URIRef("http://example.org/datasets/1")
-        g.add((dataset1, RDF.type, IAEST.Dataset))
+        g.add((dataset1, RDF.type, DCAT.Dataset))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
 
@@ -478,11 +478,11 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
         g.add((imt, RDF.value, Literal('text/turtle')))
         g.add((imt, RDFS.label, Literal('Turtle')))
 
-        g.add((distribution1_1, RDF.type, IAEST.Distribution))
+        g.add((distribution1_1, RDF.type, DCAT.Distribution))
         g.add((distribution1_1, DCT['format'], imt))
-        g.add((dataset1, IAEST.distribution, distribution1_1))
+        g.add((dataset1, DCAT.distribution, distribution1_1))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -497,7 +497,7 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
 
         contents = self._get_file_contents('catalog.rdf')
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.parse(contents)
 
@@ -516,7 +516,7 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
 
         contents = self._get_file_contents('dataset_deri.ttl')
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.parse(contents, _format='n3')
 
@@ -538,7 +538,7 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
 
         contents = self._get_file_contents('catalog_pod.jsonld')
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.parse(contents, _format='json-ld')
 
@@ -567,7 +567,7 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
 
         contents = self._get_file_contents('dataset.rdf')
 
-        p = RDFParser(profiles=['euro_iaest_ap'], compatibility_mode=True)
+        p = RDFParser(profiles=['euro_dcat_ap'], compatibility_mode=True)
 
         p.parse(contents)
 
@@ -581,20 +581,20 @@ class TestEuroIAESTAPProfileParsing(BaseParseTest):
             v = [extra['value'] for extra in dataset['extras'] if extra['key'] == key]
             return v[0] if v else None
 
-        eq_(_get_extra_value('iaest_issued'), u'2012-05-10')
-        eq_(_get_extra_value('iaest_modified'), u'2012-05-10T21:04:00')
-        eq_(_get_extra_value('iaest_publisher_name'), 'Publishing Organization for dataset 1')
-        eq_(_get_extra_value('iaest_publisher_email'), 'contact@some.org')
+        eq_(_get_extra_value('dcat_issued'), u'2012-05-10')
+        eq_(_get_extra_value('dcat_modified'), u'2012-05-10T21:04:00')
+        eq_(_get_extra_value('dcat_publisher_name'), 'Publishing Organization for dataset 1')
+        eq_(_get_extra_value('dcat_publisher_email'), 'contact@some.org')
         eq_(_get_extra_value('language'), 'ca,en,es')
 
 
-class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
+class TestEuroDCATAPProfileParsingSpatial(BaseParseTest):
 
     def test_spatial_multiple_dct_spatial_instances(self):
         g = Graph()
 
         dataset = URIRef('http://example.org/datasets/1')
-        g.add((dataset, RDF.type, IAEST.Dataset))
+        g.add((dataset, RDF.type, DCAT.Dataset))
 
         spatial_uri = URIRef('http://geonames/Newark')
         g.add((dataset, DCT.spatial, spatial_uri))
@@ -611,7 +611,7 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
         g.add((dataset, DCT.spatial, location_ref))
         g.add((location_ref, SKOS.prefLabel, Literal('Newark')))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -627,7 +627,7 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
         g = Graph()
 
         dataset = URIRef('http://example.org/datasets/1')
-        g.add((dataset, RDF.type, IAEST.Dataset))
+        g.add((dataset, RDF.type, DCAT.Dataset))
 
         spatial_uri = URIRef('http://geonames/Newark')
         g.add((dataset, DCT.spatial, spatial_uri))
@@ -638,7 +638,7 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
                Literal('{"type": "Point", "coordinates": [23, 45]}', datatype=GEOJSON_IMT)))
         g.add((spatial_uri, SKOS.prefLabel, Literal('Newark')))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -654,7 +654,7 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
         g = Graph()
 
         dataset = URIRef('http://example.org/datasets/1')
-        g.add((dataset, RDF.type, IAEST.Dataset))
+        g.add((dataset, RDF.type, DCAT.Dataset))
 
         location_ref = BNode()
         g.add((dataset, DCT.spatial, location_ref))
@@ -665,7 +665,7 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
                Literal('{"type": "Point", "coordinates": [23, 45]}', datatype=GEOJSON_IMT)))
         g.add((location_ref, SKOS.prefLabel, Literal('Newark')))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -682,7 +682,7 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
         g = Graph()
 
         dataset = URIRef('http://example.org/datasets/1')
-        g.add((dataset, RDF.type, IAEST.Dataset))
+        g.add((dataset, RDF.type, DCAT.Dataset))
 
         spatial_uri = URIRef('http://geonames/Newark')
         g.add((dataset, DCT.spatial, spatial_uri))
@@ -690,7 +690,7 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
         g.add((spatial_uri, RDF.type, DCT.Location))
         g.add((spatial_uri, RDFS.label, Literal('Newark')))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -704,7 +704,7 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
         g = Graph()
 
         dataset = URIRef('http://example.org/datasets/1')
-        g.add((dataset, RDF.type, IAEST.Dataset))
+        g.add((dataset, RDF.type, DCAT.Dataset))
 
         spatial_uri = URIRef('http://geonames/Newark')
         g.add((dataset, DCT.spatial, spatial_uri))
@@ -717,7 +717,7 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
                LOCN.geometry,
                Literal('POINT (67 89)', datatype=GSP.wktLiteral)))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -731,7 +731,7 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
         g = Graph()
 
         dataset = URIRef('http://example.org/datasets/1')
-        g.add((dataset, RDF.type, IAEST.Dataset))
+        g.add((dataset, RDF.type, DCAT.Dataset))
 
         spatial_uri = URIRef('http://geonames/Newark')
         g.add((dataset, DCT.spatial, spatial_uri))
@@ -741,7 +741,7 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
                LOCN.geometry,
                Literal('POINT (67 89)', datatype=GSP.wktLiteral)))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -755,7 +755,7 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
         g = Graph()
 
         dataset = URIRef('http://example.org/datasets/1')
-        g.add((dataset, RDF.type, IAEST.Dataset))
+        g.add((dataset, RDF.type, DCAT.Dataset))
 
         spatial_uri = URIRef('http://geonames/Newark')
         g.add((dataset, DCT.spatial, spatial_uri))
@@ -768,7 +768,7 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
                LOCN.geometry,
                Literal('Not WKT', datatype=GSP.wktLiteral)))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -782,11 +782,11 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
         g = Graph()
 
         dataset = URIRef('http://example.org/datasets/1')
-        g.add((dataset, RDF.type, IAEST.Dataset))
+        g.add((dataset, RDF.type, DCAT.Dataset))
 
         g.add((dataset, DCT.spatial, Literal('Newark')))
 
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -802,11 +802,11 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
         g = Graph()
 
         dataset = URIRef('http://example.org/datasets/1')
-        g.add((dataset, RDF.type, IAEST.Dataset))
+        g.add((dataset, RDF.type, DCAT.Dataset))
 
         spatial_uri = URIRef('http://geonames/Newark')
         g.add((dataset, DCT.spatial, spatial_uri))
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 
@@ -822,9 +822,9 @@ class TestEuroIAESTAPProfileParsingSpatial(BaseParseTest):
         g = Graph()
 
         dataset = URIRef('http://example.org/datasets/1')
-        g.add((dataset, RDF.type, IAEST.Dataset))
-        g.add((dataset, IAEST.keyword, Literal('Tree, forest, shrub')))
-        p = RDFParser(profiles=['euro_iaest_ap'])
+        g.add((dataset, RDF.type, DCAT.Dataset))
+        g.add((dataset, DCAT.keyword, Literal('Tree, forest, shrub')))
+        p = RDFParser(profiles=['euro_dcat_ap'])
 
         p.g = g
 

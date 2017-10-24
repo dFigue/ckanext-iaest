@@ -20,10 +20,10 @@ HYDRA = Namespace('http://www.w3.org/ns/hydra/core#')
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
 
 RDF_PROFILES_ENTRY_POINT_GROUP = 'ckan.rdf.profiles'
-RDF_PROFILES_CONFIG_OPTION = 'ckanext.iaest.rdf.profiles'
-COMPAT_MODE_CONFIG_OPTION = 'ckanext.iaest.compatibility_mode'
+RDF_PROFILES_CONFIG_OPTION = 'ckanext.dcat.rdf.profiles'
+COMPAT_MODE_CONFIG_OPTION = 'ckanext.dcat.compatibility_mode'
 
-DEFAULT_RDF_PROFILES = ['euro_iaest_ap']
+DEFAULT_RDF_PROFILES = ['euro_dcat_ap']
 
 
 class RDFParserException(Exception):
@@ -43,8 +43,8 @@ class RDFProcessor(object):
         You can optionally pass a list of profiles to be used.
 
         In compatibility mode, some fields are modified to maintain
-        compatibility with previous versions of the ckanext-iaest parsers
-        (eg adding the `iaest_` prefix or storing comma separated lists instead
+        compatibility with previous versions of the ckanext-dcat parsers
+        (eg adding the `dcat_` prefix or storing comma separated lists instead
         of JSON dumps).
 
         '''
@@ -297,7 +297,7 @@ class RDFSerializer(RDFProcessor):
         '''
         Returns an RDF serialization of the whole catalog
 
-        `catalog_dict` can contain literal values for the iaest:Catalog class
+        `catalog_dict` can contain literal values for the dcat:Catalog class
         like `title`, `homepage`, etc. If not provided these would get default
         values from the CKAN config (eg from `ckan.site_title`).
 
@@ -334,13 +334,13 @@ class RDFSerializer(RDFProcessor):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-        description='IAEST RDF - CKAN operations')
+        description='DCAT RDF - CKAN operations')
     parser.add_argument('mode',
                         default='consume',
                         help='''
 Operation mode.
-`consume` parses IAEST RDF graphs to CKAN dataset JSON objects.
-`produce` serializes CKAN dataset JSON objects into IAEST RDF.
+`consume` parses DCAT RDF graphs to CKAN dataset JSON objects.
+`produce` serializes CKAN dataset JSON objects into DCAT RDF.
                         ''')
     parser.add_argument('file', nargs='?', type=argparse.FileType('r'),
                         default=sys.stdin,
@@ -354,7 +354,7 @@ Operation mode.
                         help='Make the output more human readable')
     parser.add_argument('-p', '--profile', nargs='*',
                         action='store',
-                        help='RDF Profiles to use, defaults to euro_iaest_ap')
+                        help='RDF Profiles to use, defaults to euro_dcat_ap')
     parser.add_argument('-m', '--compat-mode',
                         action='store_true',
                         help='Enable compatibility mode')

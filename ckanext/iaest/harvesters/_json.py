@@ -2,19 +2,19 @@ import json
 import logging
 from hashlib import sha1
 
-from ckanext.iaest import converters
-from ckanext.iaest.harvesters.base import IAESTHarvester
+from ckanext.dcat import converters
+from ckanext.dcat.harvesters.base import DCATHarvester
 
 log = logging.getLogger(__name__)
 
 
-class IAESTJSONHarvester(IAESTHarvester):
+class DCATJSONHarvester(DCATHarvester):
 
     def info(self):
         return {
-            'name': 'iaest_json',
-            'title': 'IAEST JSON Harvester',
-            'description': 'Harvester for IAEST dataset descriptions ' +
+            'name': 'dcat_json',
+            'title': 'DCAT JSON Harvester',
+            'description': 'Harvester for DCAT dataset descriptions ' +
                            'serialized as JSON'
         }
 
@@ -46,8 +46,8 @@ class IAESTJSONHarvester(IAESTHarvester):
 
         content = harvest_object.content
 
-        iaest_dict = json.loads(content)
+        dcat_dict = json.loads(content)
 
-        package_dict = converters.iaest_to_ckan(iaest_dict)
+        package_dict = converters.dcat_to_ckan(dcat_dict)
 
-        return package_dict, iaest_dict
+        return package_dict, dcat_dict

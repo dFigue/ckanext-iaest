@@ -1,12 +1,12 @@
-# Spanish translations for ckanext-iaest.
+# Spanish translations for ckanext-dcat.
 # Copyright (C) 2015 Open Knowledge
-# This file is distributed under the same license as the ckanext-iaest
+# This file is distributed under the same license as the ckanext-dcat
 # project.
 # Adrià Mercader <amercadero@gmail.com>, 2015.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ckanext-iaest 0.1\n"
+"Project-Id-Version: ckanext-dcat 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2015-12-10 12:03+0000\n"
 "PO-Revision-Date: 2015-12-09 15:18+0000\n"
@@ -18,111 +18,111 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: ckanext/iaest/utils.py:30
+#: ckanext/dcat/utils.py:30
 msgid "URI"
 msgstr "URI"
 
-#: ckanext/iaest/utils.py:31
+#: ckanext/dcat/utils.py:31
 msgid "GUID"
 msgstr "GUID"
 
-#: ckanext/iaest/utils.py:32
+#: ckanext/dcat/utils.py:32
 msgid "Theme"
 msgstr "Tema"
 
-#: ckanext/iaest/utils.py:33
+#: ckanext/dcat/utils.py:33
 msgid "Identifier"
 msgstr "Identificador"
 
-#: ckanext/iaest/utils.py:34
+#: ckanext/dcat/utils.py:34
 msgid "Alternate identifier"
 msgstr "Identificador alternativo"
 
-#: ckanext/iaest/utils.py:35
+#: ckanext/dcat/utils.py:35
 msgid "Issued"
 msgstr "Publicado"
 
-#: ckanext/iaest/utils.py:36
+#: ckanext/dcat/utils.py:36
 msgid "Modified"
 msgstr "Modificado"
 
-#: ckanext/iaest/utils.py:37
+#: ckanext/dcat/utils.py:37
 msgid "Version notes"
 msgstr "Notas de la versión"
 
-#: ckanext/iaest/utils.py:38
+#: ckanext/dcat/utils.py:38
 msgid "Language"
 msgstr "Idioma"
 
-#: ckanext/iaest/utils.py:39
+#: ckanext/dcat/utils.py:39
 msgid "Frequency"
 msgstr "Frecuencia"
 
-#: ckanext/iaest/utils.py:40
+#: ckanext/dcat/utils.py:40
 msgid "Conforms to"
 msgstr "Conforme a"
 
-#: ckanext/iaest/utils.py:41
+#: ckanext/dcat/utils.py:41
 msgid "Spatial URI"
 msgstr "URI espacial"
 
-#: ckanext/iaest/utils.py:42
+#: ckanext/dcat/utils.py:42
 msgid "Start of temporal extent"
 msgstr "Inicio del periodo temporal"
 
-#: ckanext/iaest/utils.py:43
+#: ckanext/dcat/utils.py:43
 msgid "End of temporal extent"
 msgstr "Final del periodo temporal"
 
-#: ckanext/iaest/utils.py:44
+#: ckanext/dcat/utils.py:44
 msgid "Publisher URI"
 msgstr "URI del publicador"
 
-#: ckanext/iaest/utils.py:45
+#: ckanext/dcat/utils.py:45
 msgid "Publisher name"
 msgstr "Nombre del publicador"
 
-#: ckanext/iaest/utils.py:46
+#: ckanext/dcat/utils.py:46
 msgid "Publisher email"
 msgstr "Email del publicador"
 
-#: ckanext/iaest/utils.py:47
+#: ckanext/dcat/utils.py:47
 msgid "Publisher URL"
 msgstr "URL del publicador"
 
-#: ckanext/iaest/utils.py:48
+#: ckanext/dcat/utils.py:48
 msgid "Publisher type"
 msgstr "Tipo del publicador"
 
-#: ckanext/iaest/utils.py:49
+#: ckanext/dcat/utils.py:49
 msgid "Contact name"
 msgstr "Nombre del contacto"
 
-#: ckanext/iaest/utils.py:50
+#: ckanext/dcat/utils.py:50
 msgid "Contact email"
 msgstr "Email de contacto"
 
-#: ckanext/iaest/utils.py:51
+#: ckanext/dcat/utils.py:51
 msgid "Contact URI"
 msgstr "URI del contacto"
 
-#: ckanext/iaest/utils.py:52
+#: ckanext/dcat/utils.py:52
 msgid "Download URL"
 msgstr "URL de descarga"
 
-#: ckanext/iaest/utils.py:53
+#: ckanext/dcat/utils.py:53
 msgid "Media type"
 msgstr "Tipo de medio"
 
-#: ckanext/iaest/utils.py:54
+#: ckanext/dcat/utils.py:54
 msgid "Size"
 msgstr "Tamaño"
 
-#: ckanext/iaest/utils.py:55
+#: ckanext/dcat/utils.py:55
 msgid "Rights"
 msgstr "Derechos"
 
-#: ckanext/iaest/utils.py:56
+#: ckanext/dcat/utils.py:56
 msgid "Created"
 msgstr "Creado"
 

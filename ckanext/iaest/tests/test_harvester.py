@@ -15,9 +15,9 @@ except ImportError:
 import ckanext.harvest.model as harvest_model
 from ckanext.harvest import queue
 
-from ckanext.iaest.harvesters import IAESTRDFHarvester
-from ckanext.iaest.interfaces import IIAESTRDFHarvester
-import ckanext.iaest.harvesters.rdf
+from ckanext.dcat.harvesters import DCATRDFHarvester
+from ckanext.dcat.interfaces import IDCATRDFHarvester
+import ckanext.dcat.harvesters.rdf
 
 
 eq_ = nose.tools.eq_
@@ -29,7 +29,7 @@ eq_ = nose.tools.eq_
 
 # Start monkey-patch
 
-original_get_content_and_type = IAESTRDFHarvester._get_content_and_type
+original_get_content_and_type = DCATRDFHarvester._get_content_and_type
 
 
 def _patched_get_content_and_type(self, url, harvest_job, page=1, content_type=None):
@@ -42,14 +42,14 @@ def _patched_get_content_and_type(self, url, harvest_job, page=1, content_type=N
 
     return value1, value2
 
-IAESTRDFHarvester._get_content_and_type = _patched_get_content_and_type
+DCATRDFHarvester._get_content_and_type = _patched_get_content_and_type
 
 # End monkey-patch
 
 
 class TestRDFHarvester(p.SingletonPlugin):
 
-    p.implements(IIAESTRDFHarvester)
+    p.implements(IDCATRDFHarvester)
 
     calls = defaultdict(int)
 
@@ -91,7 +91,7 @@ class TestRDFHarvester(p.SingletonPlugin):
 
 
 class TestRDFNullHarvester(TestRDFHarvester):
-    p.implements(IIAESTRDFHarvester)
+    p.implements(IDCATRDFHarvester)
     def before_update(self, harvest_object, dataset_dict, temp_dict):
         super(TestRDFNullHarvester, self).before_update(harvest_object, dataset_dict, temp_dict)
         dataset_dict.clear()
@@ -102,7 +102,7 @@ class TestRDFNullHarvester(TestRDFHarvester):
 
 
 class TestRDFExceptionHarvester(TestRDFHarvester):
-    p.implements(IIAESTRDFHarvester)
+    p.implements(IDCATRDFHarvester)
 
     raised_exception = False
 
@@ -113,7 +113,7 @@ class TestRDFExceptionHarvester(TestRDFHarvester):
             raise Exception("raising exception in before_create")
 
 
-class TestIAESTHarvestUnit(object):
+class TestDCATHarvestUnit(object):
 
     def test_get_guid_uri(self):
 
@@ -121,11 +121,11 @@ class TestIAESTHarvestUnit(object):
             'name': 'test-dataset',
             'extras': [
                 {'key': 'uri', 'value': 'http://dataset/uri'},
-                {'key': 'iaest_identifier', 'value': 'dataset_iaest_id'},
+                {'key': 'dcat_identifier', 'value': 'dataset_dcat_id'},
             ]
         }
 
-        guid = IAESTRDFHarvester()._get_guid(dataset)
+        guid = DCATRDFHarvester()._get_guid(dataset)
 
         eq_(guid, 'http://dataset/uri')
 
@@ -134,26 +134,26 @@ class TestIAESTHarvestUnit(object):
         dataset = {
             'name': 'test-dataset',
             'extras': [
-                {'key': 'identifier', 'value': 'dataset_iaest_id'},
+                {'key': 'identifier', 'value': 'dataset_dcat_id'},
             ]
         }
 
-        guid = IAESTRDFHarvester()._get_guid(dataset)
+        guid = DCATRDFHarvester()._get_guid(dataset)
 
-        eq_(guid, 'dataset_iaest_id')
+        eq_(guid, 'dataset_dcat_id')
 
-    def test_get_guid_iaest_identifier(self):
+    def test_get_guid_dcat_identifier(self):
 
         dataset = {
             'name': 'test-dataset',
             'extras': [
-                {'key': 'iaest_identifier', 'value': 'dataset_iaest_id'},
+                {'key': 'dcat_identifier', 'value': 'dataset_dcat_id'},
             ]
         }
 
-        guid = IAESTRDFHarvester()._get_guid(dataset)
+        guid = DCATRDFHarvester()._get_guid(dataset)
 
-        eq_(guid, 'dataset_iaest_id')
+        eq_(guid, 'dataset_dcat_id')
 
     def test_get_guid_uri_none(self):
 
@@ -161,24 +161,24 @@ class TestIAESTHarvestUnit(object):
             'name': 'test-dataset',
             'extras': [
                 {'key': 'uri', 'value': None},
-                {'key': 'iaest_identifier', 'value': 'dataset_iaest_id'},
+                {'key': 'dcat_identifier', 'value': 'dataset_dcat_id'},
             ]
         }
 
-        guid = IAESTRDFHarvester()._get_guid(dataset)
+        guid = DCATRDFHarvester()._get_guid(dataset)
 
-        eq_(guid, 'dataset_iaest_id')
+        eq_(guid, 'dataset_dcat_id')
 
-    def test_get_guid_iaest_identifier_none(self):
+    def test_get_guid_dcat_identifier_none(self):
 
         dataset = {
             'name': 'test-dataset',
             'extras': [
-                {'key': 'iaest_identifier', 'value': None},
+                {'key': 'dcat_identifier', 'value': None},
             ]
         }
 
-        guid = IAESTRDFHarvester()._get_guid(dataset)
+        guid = DCATRDFHarvester()._get_guid(dataset)
 
         eq_(guid, 'test-dataset')
 
@@ -190,11 +190,11 @@ class TestIAESTHarvestUnit(object):
             ]
         }
 
-        guid = IAESTRDFHarvester()._get_guid(dataset, 'http://source_url')
+        guid = DCATRDFHarvester()._get_guid(dataset, 'http://source_url')
 
         eq_(guid, 'http://source_url/test-dataset')
 
-        guid = IAESTRDFHarvester()._get_guid(dataset, 'http://source_url/')
+        guid = DCATRDFHarvester()._get_guid(dataset, 'http://source_url/')
 
         eq_(guid, 'http://source_url/test-dataset')
 
@@ -206,7 +206,7 @@ class TestIAESTHarvestUnit(object):
             ]
         }
 
-        guid = IAESTRDFHarvester()._get_guid(dataset)
+        guid = DCATRDFHarvester()._get_guid(dataset)
 
         eq_(guid, 'test-dataset')
 
@@ -217,7 +217,7 @@ class TestIAESTHarvestUnit(object):
             ]
         }
 
-        guid = IAESTRDFHarvester()._get_guid(dataset)
+        guid = DCATRDFHarvester()._get_guid(dataset)
 
         eq_(guid, None)
 
@@ -233,130 +233,130 @@ class FunctionalHarvestTest(object):
         cls.fetch_consumer = queue.get_fetch_consumer()
 
         # Minimal remote RDF file
-        cls.rdf_mock_url = 'http://some.iaest.file.rdf'
+        cls.rdf_mock_url = 'http://some.dcat.file.rdf'
         cls.rdf_content_type = 'application/rdf+xml'
         cls.rdf_content = '''<?xml version="1.0" encoding="utf-8" ?>
         <rdf:RDF
          xmlns:dct="http://purl.org/dc/terms/"
-         xmlns:iaest="http://www.w3.org/ns/iaest#"
+         xmlns:dcat="http://www.w3.org/ns/dcat#"
          xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-        <iaest:Catalog rdf:about="https://data.some.org/catalog">
-          <iaest:dataset>
-            <iaest:Dataset rdf:about="https://data.some.org/catalog/datasets/1">
+        <dcat:Catalog rdf:about="https://data.some.org/catalog">
+          <dcat:dataset>
+            <dcat:Dataset rdf:about="https://data.some.org/catalog/datasets/1">
               <dct:title>Example dataset 1</dct:title>
-            </iaest:Dataset>
-          </iaest:dataset>
-          <iaest:dataset>
-            <iaest:Dataset rdf:about="https://data.some.org/catalog/datasets/2">
+            </dcat:Dataset>
+          </dcat:dataset>
+          <dcat:dataset>
+            <dcat:Dataset rdf:about="https://data.some.org/catalog/datasets/2">
               <dct:title>Example dataset 2</dct:title>
-            </iaest:Dataset>
-          </iaest:dataset>
-        </iaest:Catalog>
+            </dcat:Dataset>
+          </dcat:dataset>
+        </dcat:Catalog>
         </rdf:RDF>
         '''
 
         # Minimal remote RDF file with pagination (1)
         # Use slashes for paginated URLs because HTTPretty won't distinguish
         # query strings
-        cls.rdf_mock_url_pagination_1 = 'http://some.iaest.file.pagination.rdf'
+        cls.rdf_mock_url_pagination_1 = 'http://some.dcat.file.pagination.rdf'
         cls.rdf_content_pagination_1 = '''<?xml version="1.0" encoding="utf-8" ?>
         <rdf:RDF
          xmlns:dct="http://purl.org/dc/terms/"
-         xmlns:iaest="http://www.w3.org/ns/iaest#"
+         xmlns:dcat="http://www.w3.org/ns/dcat#"
          xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
          xmlns:hydra="http://www.w3.org/ns/hydra/core#">
-        <iaest:Catalog rdf:about="https://data.some.org/catalog">
-          <iaest:dataset>
-            <iaest:Dataset rdf:about="https://data.some.org/catalog/datasets/1">
+        <dcat:Catalog rdf:about="https://data.some.org/catalog">
+          <dcat:dataset>
+            <dcat:Dataset rdf:about="https://data.some.org/catalog/datasets/1">
               <dct:title>Example dataset 1</dct:title>
-            </iaest:Dataset>
-          </iaest:dataset>
-          <iaest:dataset>
-            <iaest:Dataset rdf:about="https://data.some.org/catalog/datasets/2">
+            </dcat:Dataset>
+          </dcat:dataset>
+          <dcat:dataset>
+            <dcat:Dataset rdf:about="https://data.some.org/catalog/datasets/2">
               <dct:title>Example dataset 2</dct:title>
-            </iaest:Dataset>
-          </iaest:dataset>
-        </iaest:Catalog>
-        <hydra:PagedCollection rdf:about="http://some.iaest.file.pagination.rdf/page/1">
+            </dcat:Dataset>
+          </dcat:dataset>
+        </dcat:Catalog>
+        <hydra:PagedCollection rdf:about="http://some.dcat.file.pagination.rdf/page/1">
             <hydra:totalItems rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</hydra:totalItems>
-            <hydra:lastPage>http://some.iaest.file.pagination.rdf/page/2</hydra:lastPage>
+            <hydra:lastPage>http://some.dcat.file.pagination.rdf/page/2</hydra:lastPage>
             <hydra:itemsPerPage rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</hydra:itemsPerPage>
-            <hydra:nextPage>http://some.iaest.file.pagination.rdf/page/2</hydra:nextPage>
-            <hydra:firstPage>http://some.iaest.file.pagination.rdf/page/1</hydra:firstPage>
+            <hydra:nextPage>http://some.dcat.file.pagination.rdf/page/2</hydra:nextPage>
+            <hydra:firstPage>http://some.dcat.file.pagination.rdf/page/1</hydra:firstPage>
         </hydra:PagedCollection>
         </rdf:RDF>
         '''
 
         # Minimal remote RDF file with pagination (2)
-        cls.rdf_mock_url_pagination_2 = 'http://some.iaest.file.pagination.rdf/page/2'
+        cls.rdf_mock_url_pagination_2 = 'http://some.dcat.file.pagination.rdf/page/2'
         cls.rdf_content_pagination_2 = '''<?xml version="1.0" encoding="utf-8" ?>
         <rdf:RDF
          xmlns:dct="http://purl.org/dc/terms/"
-         xmlns:iaest="http://www.w3.org/ns/iaest#"
+         xmlns:dcat="http://www.w3.org/ns/dcat#"
          xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
          xmlns:hydra="http://www.w3.org/ns/hydra/core#">
-        <iaest:Catalog rdf:about="https://data.some.org/catalog">
-          <iaest:dataset>
-            <iaest:Dataset rdf:about="https://data.some.org/catalog/datasets/3">
+        <dcat:Catalog rdf:about="https://data.some.org/catalog">
+          <dcat:dataset>
+            <dcat:Dataset rdf:about="https://data.some.org/catalog/datasets/3">
               <dct:title>Example dataset 3</dct:title>
-            </iaest:Dataset>
-          </iaest:dataset>
-          <iaest:dataset>
-            <iaest:Dataset rdf:about="https://data.some.org/catalog/datasets/4">
+            </dcat:Dataset>
+          </dcat:dataset>
+          <dcat:dataset>
+            <dcat:Dataset rdf:about="https://data.some.org/catalog/datasets/4">
               <dct:title>Example dataset 4</dct:title>
-            </iaest:Dataset>
-          </iaest:dataset>
-        </iaest:Catalog>
-        <hydra:PagedCollection rdf:about="http://some.iaest.file.pagination.rdf/page/1">
+            </dcat:Dataset>
+          </dcat:dataset>
+        </dcat:Catalog>
+        <hydra:PagedCollection rdf:about="http://some.dcat.file.pagination.rdf/page/1">
             <hydra:totalItems rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</hydra:totalItems>
-            <hydra:lastPage>http://some.iaest.file.pagination.rdf/page/2</hydra:lastPage>
+            <hydra:lastPage>http://some.dcat.file.pagination.rdf/page/2</hydra:lastPage>
             <hydra:itemsPerPage rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</hydra:itemsPerPage>
-            <hydra:previousPage>http://some.iaest.file.pagination.rdf/page/1</hydra:previousPage>
-            <hydra:firstPage>http://some.iaest.file.pagination.rdf/page/1</hydra:firstPage>
+            <hydra:previousPage>http://some.dcat.file.pagination.rdf/page/1</hydra:previousPage>
+            <hydra:firstPage>http://some.dcat.file.pagination.rdf/page/1</hydra:firstPage>
         </hydra:PagedCollection>
         </rdf:RDF>
         '''
 
         # Minimal remote RDF file
-        cls.rdf_mock_url = 'http://some.iaest.file.rdf'
+        cls.rdf_mock_url = 'http://some.dcat.file.rdf'
         cls.rdf_content_type = 'application/rdf+xml'
         cls.rdf_content = '''<?xml version="1.0" encoding="utf-8" ?>
         <rdf:RDF
          xmlns:dct="http://purl.org/dc/terms/"
-         xmlns:iaest="http://www.w3.org/ns/iaest#"
+         xmlns:dcat="http://www.w3.org/ns/dcat#"
          xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-        <iaest:Catalog rdf:about="https://data.some.org/catalog">
-          <iaest:dataset>
-            <iaest:Dataset rdf:about="https://data.some.org/catalog/datasets/1">
+        <dcat:Catalog rdf:about="https://data.some.org/catalog">
+          <dcat:dataset>
+            <dcat:Dataset rdf:about="https://data.some.org/catalog/datasets/1">
               <dct:title>Example dataset 1</dct:title>
-            </iaest:Dataset>
-          </iaest:dataset>
-          <iaest:dataset>
-            <iaest:Dataset rdf:about="https://data.some.org/catalog/datasets/2">
+            </dcat:Dataset>
+          </dcat:dataset>
+          <dcat:dataset>
+            <dcat:Dataset rdf:about="https://data.some.org/catalog/datasets/2">
               <dct:title>Example dataset 2</dct:title>
-            </iaest:Dataset>
-          </iaest:dataset>
-        </iaest:Catalog>
+            </dcat:Dataset>
+          </dcat:dataset>
+        </dcat:Catalog>
         </rdf:RDF>
         '''
 
         cls.rdf_remote_file_small = '''<?xml version="1.0" encoding="utf-8" ?>
         <rdf:RDF
          xmlns:dct="http://purl.org/dc/terms/"
-         xmlns:iaest="http://www.w3.org/ns/iaest#"
+         xmlns:dcat="http://www.w3.org/ns/dcat#"
          xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-        <iaest:Catalog rdf:about="https://data.some.org/catalog">
-          <iaest:dataset>
-            <iaest:Dataset rdf:about="https://data.some.org/catalog/datasets/1">
+        <dcat:Catalog rdf:about="https://data.some.org/catalog">
+          <dcat:dataset>
+            <dcat:Dataset rdf:about="https://data.some.org/catalog/datasets/1">
               <dct:title>Example dataset 1</dct:title>
-            </iaest:Dataset>
-          </iaest:dataset>
-        </iaest:Catalog>
+            </dcat:Dataset>
+          </dcat:dataset>
+        </dcat:Catalog>
         </rdf:RDF>
         '''
 
@@ -364,112 +364,112 @@ class FunctionalHarvestTest(object):
         cls.rdf_content_with_distribution_uri = '''<?xml version="1.0" encoding="utf-8" ?>
         <rdf:RDF
          xmlns:dct="http://purl.org/dc/terms/"
-         xmlns:iaest="http://www.w3.org/ns/iaest#"
+         xmlns:dcat="http://www.w3.org/ns/dcat#"
          xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-        <iaest:Catalog rdf:about="https://data.some.org/catalog">
-          <iaest:dataset>
-            <iaest:Dataset rdf:about="https://data.some.org/catalog/datasets/1">
+        <dcat:Catalog rdf:about="https://data.some.org/catalog">
+          <dcat:dataset>
+            <dcat:Dataset rdf:about="https://data.some.org/catalog/datasets/1">
               <dct:title>Example dataset 1</dct:title>
-              <iaest:distribution>
-                <iaest:Distribution rdf:about="https://data.some.org/catalog/datasets/1/resource/1">
+              <dcat:distribution>
+                <dcat:Distribution rdf:about="https://data.some.org/catalog/datasets/1/resource/1">
                   <dct:title>Example resource 1</dct:title>
-                  <iaest:accessURL>http://data.some.org/download.zip</iaest:accessURL>
-                </iaest:Distribution>
-              </iaest:distribution>
-            </iaest:Dataset>
-          </iaest:dataset>
-        </iaest:Catalog>
+                  <dcat:accessURL>http://data.some.org/download.zip</dcat:accessURL>
+                </dcat:Distribution>
+              </dcat:distribution>
+            </dcat:Dataset>
+          </dcat:dataset>
+        </dcat:Catalog>
         </rdf:RDF>
         '''
         cls.rdf_content_with_distribution = '''<?xml version="1.0" encoding="utf-8" ?>
         <rdf:RDF
          xmlns:dct="http://purl.org/dc/terms/"
-         xmlns:iaest="http://www.w3.org/ns/iaest#"
+         xmlns:dcat="http://www.w3.org/ns/dcat#"
          xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-        <iaest:Catalog rdf:about="https://data.some.org/catalog">
-          <iaest:dataset>
-            <iaest:Dataset rdf:about="https://data.some.org/catalog/datasets/1">
+        <dcat:Catalog rdf:about="https://data.some.org/catalog">
+          <dcat:dataset>
+            <dcat:Dataset rdf:about="https://data.some.org/catalog/datasets/1">
               <dct:title>Example dataset 1</dct:title>
-              <iaest:distribution>
-                <iaest:Distribution>
+              <dcat:distribution>
+                <dcat:Distribution>
                   <dct:title>Example resource 1</dct:title>
-                  <iaest:accessURL>http://data.some.org/download.zip</iaest:accessURL>
-                </iaest:Distribution>
-              </iaest:distribution>
-            </iaest:Dataset>
-          </iaest:dataset>
-        </iaest:Catalog>
+                  <dcat:accessURL>http://data.some.org/download.zip</dcat:accessURL>
+                </dcat:Distribution>
+              </dcat:distribution>
+            </dcat:Dataset>
+          </dcat:dataset>
+        </dcat:Catalog>
         </rdf:RDF>
         '''
 
         cls.rdf_remote_file_invalid = '''<?xml version="1.0" encoding="utf-8" ?>
         <rdf:RDF
-         xmlns:iaest="http://www.w3.org/ns/iaest#"
+         xmlns:dcat="http://www.w3.org/ns/dcat#"
          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-        <iaest:Catalog
+        <dcat:Catalog
         </rdf:RDF>
         '''
 
         #Minimal remote turtle file
-        cls.ttl_mock_url = 'http://some.iaest.file.ttl'
+        cls.ttl_mock_url = 'http://some.dcat.file.ttl'
         cls.ttl_content_type = 'text/turtle'
-        cls.ttl_content = '''@prefix iaest: <http://www.w3.org/ns/iaest#> .
+        cls.ttl_content = '''@prefix dcat: <http://www.w3.org/ns/dcat#> .
         @prefix dc: <http://purl.org/dc/terms/> .
         <https://data.some.org/catalog>
-          a iaest:Catalog ;
-          iaest:dataset <https://data.some.org/catalog/datasets/1>, <https://data.some.org/catalog/datasets/2> .
+          a dcat:Catalog ;
+          dcat:dataset <https://data.some.org/catalog/datasets/1>, <https://data.some.org/catalog/datasets/2> .
         <https://data.some.org/catalog/datasets/1>
-          a iaest:Dataset ;
+          a dcat:Dataset ;
           dc:title "Example dataset 1" .
         <https://data.some.org/catalog/datasets/2>
-          a iaest:Dataset ;
+          a dcat:Dataset ;
           dc:title "Example dataset 2" .
           '''
-        cls.ttl_remote_file_small = '''@prefix iaest: <http://www.w3.org/ns/iaest#> .
+        cls.ttl_remote_file_small = '''@prefix dcat: <http://www.w3.org/ns/dcat#> .
         @prefix dc: <http://purl.org/dc/terms/> .
         <https://data.some.org/catalog>
-          a iaest:Catalog ;
-          iaest:dataset <https://data.some.org/catalog/datasets/1>, <https://data.some.org/catalog/datasets/2> .
+          a dcat:Catalog ;
+          dcat:dataset <https://data.some.org/catalog/datasets/1>, <https://data.some.org/catalog/datasets/2> .
         <https://data.some.org/catalog/datasets/1>
-          a iaest:Dataset ;
+          a dcat:Dataset ;
           dc:title "Example dataset 1" .
           '''
-        cls.ttl_unicode_in_keywords = u'''@prefix iaest: <http://www.w3.org/ns/iaest#> .
+        cls.ttl_unicode_in_keywords = u'''@prefix dcat: <http://www.w3.org/ns/dcat#> .
         @prefix dc: <http://purl.org/dc/terms/> .
         <https://data.some.org/catalog>
-          a iaest:Catalog ;
-          iaest:dataset <https://data.some.org/catalog/datasets/1> .
+          a dcat:Catalog ;
+          dcat:dataset <https://data.some.org/catalog/datasets/1> .
         <https://data.some.org/catalog/datasets/1>
-          a iaest:Dataset ;
+          a dcat:Dataset ;
           dc:title "Example dataset 1" ;
-          iaest:keyword "förskola", "Garduña" .
+          dcat:keyword "förskola", "Garduña" .
         <https://data.some.org/catalog/datasets/2>
-          a iaest:Dataset ;
+          a dcat:Dataset ;
           dc:title "Example dataset 2" ;
-          iaest:keyword "San Sebastián", "Ελλάδα" .
+          dcat:keyword "San Sebastián", "Ελλάδα" .
           '''
-        cls.ttl_commas_in_keywords = u'''@prefix iaest: <http://www.w3.org/ns/iaest#> .
+        cls.ttl_commas_in_keywords = u'''@prefix dcat: <http://www.w3.org/ns/dcat#> .
         @prefix dc: <http://purl.org/dc/terms/> .
         <https://data.some.org/catalog>
-          a iaest:Catalog ;
-          iaest:dataset <https://data.some.org/catalog/datasets/1> .
+          a dcat:Catalog ;
+          dcat:dataset <https://data.some.org/catalog/datasets/1> .
         <https://data.some.org/catalog/datasets/1>
-          a iaest:Dataset ;
+          a dcat:Dataset ;
           dc:title "Example dataset 1" ;
-          iaest:keyword "Utbildning, kontaktuppgifter" .
+          dcat:keyword "Utbildning, kontaktuppgifter" .
         <https://data.some.org/catalog/datasets/2>
-          a iaest:Dataset ;
+          a dcat:Dataset ;
           dc:title "Example dataset 2" ;
-          iaest:keyword "Trees, forest, shrub" .
+          dcat:keyword "Trees, forest, shrub" .
           '''
-        cls.ttl_remote_file_invalid = '''@prefix iaest: <http://www.w3.org/ns/iaest#> .
+        cls.ttl_remote_file_invalid = '''@prefix dcat: <http://www.w3.org/ns/dcat#> .
         @prefix dc: <http://purl.org/dc/terms/> .
         <https://data.some.org/catalog>
-          a iaest:Catalog ;
+          a dcat:Catalog ;
         <https://data.some.org/catalog/datasets/1>
-          a iaest:Dataset ;
+          a dcat:Dataset ;
           dc:title "Example dataset 1" .
           '''
 
@@ -485,10 +485,10 @@ class FunctionalHarvestTest(object):
     def _create_harvest_source(self, mock_url, **kwargs):
 
         source_dict = {
-            'title': 'Test RDF IAEST Source',
-            'name': 'test-rdf-iaest-source',
+            'title': 'Test RDF DCAT Source',
+            'name': 'test-rdf-dcat-source',
             'url': mock_url,
-            'source_type': 'iaest_rdf',
+            'source_type': 'dcat_rdf',
         }
 
         source_dict.update(**kwargs)
@@ -496,7 +496,7 @@ class FunctionalHarvestTest(object):
         harvest_source = h.call_action('harvest_source_create',
                                        {}, **source_dict)
 
-        eq_(harvest_source['source_type'], 'iaest_rdf')
+        eq_(harvest_source['source_type'], 'dcat_rdf')
 
         return harvest_source
 
@@ -559,7 +559,7 @@ class FunctionalHarvestTest(object):
         self._fetch_queue(num_objects)
 
 
-class TestIAESTHarvestFunctional(FunctionalHarvestTest):
+class TestDCATHarvestFunctional(FunctionalHarvestTest):
 
     def test_harvest_create_rdf(self):
 
@@ -902,7 +902,7 @@ class TestIAESTHarvestFunctional(FunctionalHarvestTest):
         assert ('Error parsing the RDF file'
                 in last_job_status['gather_error_summary'][0][0])
 
-    @patch.object(ckanext.iaest.harvesters.rdf.RDFParser, 'datasets')
+    @patch.object(ckanext.dcat.harvesters.rdf.RDFParser, 'datasets')
     def test_harvest_exception_in_profile(self, mock_datasets):
         mock_datasets.side_effect = Exception
 
@@ -934,12 +934,12 @@ class TestIAESTHarvestFunctional(FunctionalHarvestTest):
                 in last_job_status['gather_error_summary'][0][0])
 
 
-class TestIAESTHarvestFunctionalExtensionPoints(FunctionalHarvestTest):
+class TestDCATHarvestFunctionalExtensionPoints(FunctionalHarvestTest):
 
     @classmethod
     def setup_class(self):
 
-        super(TestIAESTHarvestFunctionalExtensionPoints, self).setup_class()
+        super(TestDCATHarvestFunctionalExtensionPoints, self).setup_class()
 
         p.load('test_rdf_harvester')
 
@@ -950,14 +950,14 @@ class TestIAESTHarvestFunctionalExtensionPoints(FunctionalHarvestTest):
 
     def setup(self):
 
-        super(TestIAESTHarvestFunctionalExtensionPoints, self).setup()
+        super(TestDCATHarvestFunctionalExtensionPoints, self).setup()
 
         plugin = p.get_plugin('test_rdf_harvester')
         plugin.calls = defaultdict(int)
 
     def teardown(self):
 
-        super(TestIAESTHarvestFunctionalExtensionPoints, self).teardown()
+        super(TestDCATHarvestFunctionalExtensionPoints, self).teardown()
 
         plugin = p.get_plugin('test_rdf_harvester')
         plugin.calls = defaultdict(int)
@@ -1203,11 +1203,11 @@ class TestIAESTHarvestFunctionalExtensionPoints(FunctionalHarvestTest):
         eq_(plugin.calls['after_update'], 2)
 
 
-class TestIAESTHarvestFunctionalSetNull(FunctionalHarvestTest):
+class TestDCATHarvestFunctionalSetNull(FunctionalHarvestTest):
 
     @classmethod
     def setup_class(self):
-        super(TestIAESTHarvestFunctionalSetNull, self).setup_class()
+        super(TestDCATHarvestFunctionalSetNull, self).setup_class()
         p.load('test_rdf_null_harvester')
 
     @classmethod
@@ -1215,13 +1215,13 @@ class TestIAESTHarvestFunctionalSetNull(FunctionalHarvestTest):
         p.unload('test_rdf_null_harvester')
 
     def setup(self):
-        super(TestIAESTHarvestFunctionalSetNull, self).setup()
+        super(TestDCATHarvestFunctionalSetNull, self).setup()
 
         plugin = p.get_plugin('test_rdf_null_harvester')
         plugin.calls = defaultdict(int)
 
     def teardown(self):
-        super(TestIAESTHarvestFunctionalSetNull, self).teardown()
+        super(TestDCATHarvestFunctionalSetNull, self).teardown()
 
         plugin = p.get_plugin('test_rdf_null_harvester')
         plugin.calls = defaultdict(int)
@@ -1272,11 +1272,11 @@ class TestIAESTHarvestFunctionalSetNull(FunctionalHarvestTest):
         eq_(plugin.calls['after_update'], 0)
 
 
-class TestIAESTHarvestFunctionalRaiseExcpetion(FunctionalHarvestTest):
+class TestDCATHarvestFunctionalRaiseExcpetion(FunctionalHarvestTest):
 
     @classmethod
     def setup_class(self):
-        super(TestIAESTHarvestFunctionalRaiseExcpetion, self).setup_class()
+        super(TestDCATHarvestFunctionalRaiseExcpetion, self).setup_class()
         p.load('test_rdf_exception_harvester')
 
     @classmethod
@@ -1284,13 +1284,13 @@ class TestIAESTHarvestFunctionalRaiseExcpetion(FunctionalHarvestTest):
         p.unload('test_rdf_exception_harvester')
 
     def setup(self):
-        super(TestIAESTHarvestFunctionalRaiseExcpetion, self).setup()
+        super(TestDCATHarvestFunctionalRaiseExcpetion, self).setup()
 
         plugin = p.get_plugin('test_rdf_exception_harvester')
         plugin.calls = defaultdict(int)
 
     def teardown(self):
-        super(TestIAESTHarvestFunctionalRaiseExcpetion, self).teardown()
+        super(TestDCATHarvestFunctionalRaiseExcpetion, self).teardown()
 
         plugin = p.get_plugin('test_rdf_exception_harvester')
         plugin.calls = defaultdict(int)
@@ -1344,16 +1344,16 @@ class TestIAESTHarvestFunctionalRaiseExcpetion(FunctionalHarvestTest):
         eq_(plugin.calls['after_update'], 0)
 
 
-class TestIAESTRDFHarvester(object):
+class TestDCATRDFHarvester(object):
 
     def test_validates_correct_config(self):
-        harvester = IAESTRDFHarvester()
+        harvester = DCATRDFHarvester()
 
         for config in ['{}', '{"rdf_format":"text/turtle"}']:
             eq_(config, harvester.validate_config(config))
 
     def test_does_not_validate_incorrect_config(self):
-        harvester = IAESTRDFHarvester()
+        harvester = DCATRDFHarvester()
 
         for config in ['invalid', '{invalid}', '{rdf_format:invalid}']:
             try:
@@ -1363,11 +1363,11 @@ class TestIAESTRDFHarvester(object):
                 assert True
 
 
-class TestIIAESTRDFHarvester(object):
+class TestIDCATRDFHarvester(object):
 
     def test_before_download(self):
 
-        i = IIAESTRDFHarvester()
+        i = IDCATRDFHarvester()
 
         url = 'http://some.url'
 
@@ -1378,7 +1378,7 @@ class TestIIAESTRDFHarvester(object):
 
     def test_after_download(self):
 
-        i = IIAESTRDFHarvester()
+        i = IDCATRDFHarvester()
 
         content = 'some.content'
 

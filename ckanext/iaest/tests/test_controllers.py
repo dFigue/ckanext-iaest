@@ -15,9 +15,9 @@ try:
 except ImportError:
     from ckan.new_tests import helpers, factories
 
-from ckanext.iaest.processors import RDFParser
-from ckanext.iaest.profiles import RDF, IAEST
-from ckanext.iaest.processors import HYDRA
+from ckanext.dcat.processors import RDFParser
+from ckanext.dcat.profiles import RDF, DCAT
+from ckanext.dcat.processors import HYDRA
 
 eq_ = nose.tools.eq_
 assert_true = nose.tools.assert_true
@@ -41,7 +41,7 @@ class TestEndpoints(helpers.FunctionalTestBase):
             notes='Test dataset'
         )
 
-        url = url_for('iaest_dataset', _id=dataset['id'], _format='rdf')
+        url = url_for('dcat_dataset', _id=dataset['id'], _format='rdf')
 
         app = self._get_test_app()
 
@@ -56,14 +56,14 @@ class TestEndpoints(helpers.FunctionalTestBase):
 
         p.parse(content, _format='xml')
 
-        iaest_datasets = [d for d in p.datasets()]
+        dcat_datasets = [d for d in p.datasets()]
 
-        eq_(len(iaest_datasets), 1)
+        eq_(len(dcat_datasets), 1)
 
-        iaest_dataset = iaest_datasets[0]
+        dcat_dataset = dcat_datasets[0]
 
-        eq_(iaest_dataset['title'], dataset['title'])
-        eq_(iaest_dataset['notes'], dataset['notes'])
+        eq_(dcat_dataset['title'], dataset['title'])
+        eq_(dcat_dataset['notes'], dataset['notes'])
 
     def test_dataset_xml(self):
 
@@ -71,7 +71,7 @@ class TestEndpoints(helpers.FunctionalTestBase):
             notes='Test dataset'
         )
 
-        url = url_for('iaest_dataset', _id=dataset['id'], _format='xml')
+        url = url_for('dcat_dataset', _id=dataset['id'], _format='xml')
 
         app = self._get_test_app()
 
@@ -86,14 +86,14 @@ class TestEndpoints(helpers.FunctionalTestBase):
 
         p.parse(content, _format='xml')
 
-        iaest_datasets = [d for d in p.datasets()]
+        dcat_datasets = [d for d in p.datasets()]
 
-        eq_(len(iaest_datasets), 1)
+        eq_(len(dcat_datasets), 1)
 
-        iaest_dataset = iaest_datasets[0]
+        dcat_dataset = dcat_datasets[0]
 
-        eq_(iaest_dataset['title'], dataset['title'])
-        eq_(iaest_dataset['notes'], dataset['notes'])
+        eq_(dcat_dataset['title'], dataset['title'])
+        eq_(dcat_dataset['notes'], dataset['notes'])
 
     def test_dataset_ttl(self):
 
@@ -101,7 +101,7 @@ class TestEndpoints(helpers.FunctionalTestBase):
             notes='Test dataset'
         )
 
-        url = url_for('iaest_dataset', _id=dataset['id'], _format='ttl')
+        url = url_for('dcat_dataset', _id=dataset['id'], _format='ttl')
 
         app = self._get_test_app()
 
@@ -116,14 +116,14 @@ class TestEndpoints(helpers.FunctionalTestBase):
 
         p.parse(content, _format='turtle')
 
-        iaest_datasets = [d for d in p.datasets()]
+        dcat_datasets = [d for d in p.datasets()]
 
-        eq_(len(iaest_datasets), 1)
+        eq_(len(dcat_datasets), 1)
 
-        iaest_dataset = iaest_datasets[0]
+        dcat_dataset = dcat_datasets[0]
 
-        eq_(iaest_dataset['title'], dataset['title'])
-        eq_(iaest_dataset['notes'], dataset['notes'])
+        eq_(dcat_dataset['title'], dataset['title'])
+        eq_(dcat_dataset['notes'], dataset['notes'])
 
     def test_dataset_n3(self):
 
@@ -131,7 +131,7 @@ class TestEndpoints(helpers.FunctionalTestBase):
             notes='Test dataset'
         )
 
-        url = url_for('iaest_dataset', _id=dataset['id'], _format='n3')
+        url = url_for('dcat_dataset', _id=dataset['id'], _format='n3')
 
         app = self._get_test_app()
 
@@ -146,14 +146,14 @@ class TestEndpoints(helpers.FunctionalTestBase):
 
         p.parse(content, _format='n3')
 
-        iaest_datasets = [d for d in p.datasets()]
+        dcat_datasets = [d for d in p.datasets()]
 
-        eq_(len(iaest_datasets), 1)
+        eq_(len(dcat_datasets), 1)
 
-        iaest_dataset = iaest_datasets[0]
+        dcat_dataset = dcat_datasets[0]
 
-        eq_(iaest_dataset['title'], dataset['title'])
-        eq_(iaest_dataset['notes'], dataset['notes'])
+        eq_(dcat_dataset['title'], dataset['title'])
+        eq_(dcat_dataset['notes'], dataset['notes'])
 
     def test_dataset_jsonld(self):
 
@@ -161,7 +161,7 @@ class TestEndpoints(helpers.FunctionalTestBase):
             notes='Test dataset'
         )
 
-        url = url_for('iaest_dataset', _id=dataset['id'], _format='jsonld')
+        url = url_for('dcat_dataset', _id=dataset['id'], _format='jsonld')
 
         app = self._get_test_app()
 
@@ -176,19 +176,19 @@ class TestEndpoints(helpers.FunctionalTestBase):
 
         p.parse(content, _format='json-ld')
 
-        iaest_datasets = [d for d in p.datasets()]
+        dcat_datasets = [d for d in p.datasets()]
 
-        eq_(len(iaest_datasets), 1)
+        eq_(len(dcat_datasets), 1)
 
-        iaest_dataset = iaest_datasets[0]
+        dcat_dataset = dcat_datasets[0]
 
-        eq_(iaest_dataset['title'], dataset['title'])
-        eq_(iaest_dataset['notes'], dataset['notes'])
+        eq_(dcat_dataset['title'], dataset['title'])
+        eq_(dcat_dataset['notes'], dataset['notes'])
 
     def test_dataset_not_found(self):
         import uuid
 
-        url = url_for('iaest_dataset', _id=str(uuid.uuid4()), _format='n3')
+        url = url_for('dcat_dataset', _id=str(uuid.uuid4()), _format='n3')
         app = self._get_test_app()
         app.get(url, status=404)
 
@@ -210,7 +210,7 @@ class TestEndpoints(helpers.FunctionalTestBase):
         for i in xrange(4):
             factories.Dataset()
 
-        url = url_for('iaest_catalog', _format='rdf')
+        url = url_for('dcat_catalog', _format='rdf')
 
         app = self._get_test_app()
 
@@ -225,16 +225,16 @@ class TestEndpoints(helpers.FunctionalTestBase):
 
         p.parse(content, _format='xml')
 
-        iaest_datasets = [d for d in p.datasets()]
+        dcat_datasets = [d for d in p.datasets()]
 
-        eq_(len(iaest_datasets), 4)
+        eq_(len(dcat_datasets), 4)
 
     def test_catalog_ttl(self):
 
         for i in xrange(4):
             factories.Dataset()
 
-        url = url_for('iaest_catalog', _format='ttl')
+        url = url_for('dcat_catalog', _format='ttl')
 
         app = self._get_test_app()
 
@@ -249,9 +249,9 @@ class TestEndpoints(helpers.FunctionalTestBase):
 
         p.parse(content, _format='turtle')
 
-        iaest_datasets = [d for d in p.datasets()]
+        dcat_datasets = [d for d in p.datasets()]
 
-        eq_(len(iaest_datasets), 4)
+        eq_(len(dcat_datasets), 4)
 
     def test_catalog_modified_date(self):
 
@@ -259,7 +259,7 @@ class TestEndpoints(helpers.FunctionalTestBase):
         time.sleep(1)
         dataset2 = factories.Dataset(title='Second dataset')
 
-        url = url_for('iaest_catalog',
+        url = url_for('dcat_catalog',
                       _format='ttl',
                       modified_since=dataset2['metadata_modified'])
 
@@ -273,15 +273,15 @@ class TestEndpoints(helpers.FunctionalTestBase):
 
         p.parse(content, _format='turtle')
 
-        iaest_datasets = [d for d in p.datasets()]
+        dcat_datasets = [d for d in p.datasets()]
 
-        eq_(len(iaest_datasets), 1)
+        eq_(len(dcat_datasets), 1)
 
-        eq_(iaest_datasets[0]['title'], dataset2['title'])
+        eq_(dcat_datasets[0]['title'], dataset2['title'])
 
     def test_catalog_modified_date_wrong_date(self):
 
-        url = url_for('iaest_catalog',
+        url = url_for('dcat_catalog',
                       _format='ttl',
                       modified_since='wrong_date')
 
@@ -289,7 +289,7 @@ class TestEndpoints(helpers.FunctionalTestBase):
 
         app.get(url, status=409)
 
-    @helpers.change_config('ckanext.iaest.datasets_per_page', 10)
+    @helpers.change_config('ckanext.dcat.datasets_per_page', 10)
     def test_catalog_pagination(self):
 
         for i in xrange(12):
@@ -297,7 +297,7 @@ class TestEndpoints(helpers.FunctionalTestBase):
 
         app = self._get_test_app()
 
-        url = url_for('iaest_catalog', _format='rdf')
+        url = url_for('dcat_catalog', _format='rdf')
 
         response = app.get(url)
 
@@ -306,7 +306,7 @@ class TestEndpoints(helpers.FunctionalTestBase):
         g = Graph()
         g.parse(data=content, format='xml')
 
-        eq_(len([d for d in g.subjects(RDF.type, IAEST.Dataset)]), 10)
+        eq_(len([d for d in g.subjects(RDF.type, DCAT.Dataset)]), 10)
 
         pagination = [o for o in g.subjects(RDF.type, HYDRA.PagedCollection)][0]
 
@@ -315,18 +315,18 @@ class TestEndpoints(helpers.FunctionalTestBase):
         eq_(self._object_value(g, pagination, HYDRA.itemsPerPage), '10')
 
         eq_(self._object_value(g, pagination, HYDRA.firstPage),
-            url_for('iaest_catalog', _format='rdf', page=1, host='test.ckan.net'))
+            url_for('dcat_catalog', _format='rdf', page=1, host='test.ckan.net'))
 
         eq_(self._object_value(g, pagination, HYDRA.nextPage),
-            url_for('iaest_catalog', _format='rdf', page=2, host='test.ckan.net'))
+            url_for('dcat_catalog', _format='rdf', page=2, host='test.ckan.net'))
 
         eq_(self._object_value(g, pagination, HYDRA.lastPage),
-            url_for('iaest_catalog', _format='rdf', page=2, host='test.ckan.net'))
+            url_for('dcat_catalog', _format='rdf', page=2, host='test.ckan.net'))
 
 
 class TestAcceptHeader(helpers.FunctionalTestBase):
     '''
-    ckanext.iaest.enable_content_negotiation is enabled on test.ini
+    ckanext.dcat.enable_content_negotiation is enabled on test.ini
     '''
 
     @classmethod

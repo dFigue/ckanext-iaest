@@ -5,7 +5,7 @@ from pylons import config
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import Namespace, RDF
 
-from ckanext.iaest.processors import (
+from ckanext.dcat.processors import (
     RDFParser,
     RDFParserException,
     RDFProfileException,
@@ -13,10 +13,10 @@ from ckanext.iaest.processors import (
     RDF_PROFILES_CONFIG_OPTION
 )
 
-from ckanext.iaest.profiles import RDFProfile
+from ckanext.dcat.profiles import RDFProfile
 
 DCT = Namespace("http://purl.org/dc/terms/")
-IAEST = Namespace("http://www.w3.org/ns/iaest#")
+DCAT = Namespace("http://www.w3.org/ns/dcat#")
 
 eq_ = nose.tools.eq_
 
@@ -26,27 +26,27 @@ def _default_graph():
     g = Graph()
 
     dataset1 = URIRef("http://example.org/datasets/1")
-    g.add((dataset1, RDF.type, IAEST.Dataset))
+    g.add((dataset1, RDF.type, DCAT.Dataset))
     g.add((dataset1, DCT.title, Literal('Test Dataset 1')))
 
     distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
-    g.add((distribution1_1, RDF.type, IAEST.Distribution))
+    g.add((distribution1_1, RDF.type, DCAT.Distribution))
     distribution1_2 = URIRef("http://example.org/datasets/1/ds/2")
-    g.add((distribution1_2, RDF.type, IAEST.Distribution))
+    g.add((distribution1_2, RDF.type, DCAT.Distribution))
 
-    g.add((dataset1, IAEST.distribution, distribution1_1))
-    g.add((dataset1, IAEST.distribution, distribution1_2))
+    g.add((dataset1, DCAT.distribution, distribution1_1))
+    g.add((dataset1, DCAT.distribution, distribution1_2))
 
     dataset2 = URIRef("http://example.org/datasets/2")
-    g.add((dataset2, RDF.type, IAEST.Dataset))
+    g.add((dataset2, RDF.type, DCAT.Dataset))
     g.add((dataset2, DCT.title, Literal('Test Dataset 2')))
 
     distribution2_1 = URIRef("http://example.org/datasets/2/ds/1")
-    g.add((distribution2_1, RDF.type, IAEST.Distribution))
-    g.add((dataset2, IAEST.distribution, distribution2_1))
+    g.add((distribution2_1, RDF.type, DCAT.Distribution))
+    g.add((dataset2, DCAT.distribution, distribution2_1))
 
     dataset3 = URIRef("http://example.org/datasets/3")
-    g.add((dataset3, RDF.type, IAEST.Dataset))
+    g.add((dataset3, RDF.type, DCAT.Dataset))
     g.add((dataset3, DCT.title, Literal('Test Dataset 3')))
 
     return g

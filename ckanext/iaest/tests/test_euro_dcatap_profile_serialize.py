@@ -15,9 +15,9 @@ try:
 except ImportError:
     from ckan.new_tests import helpers, factories
 
-from ckanext.iaest import utils
-from ckanext.iaest.processors import RDFSerializer
-from ckanext.iaest.profiles import (IAEST, DCT, ADMS, XSD, VCARD, FOAF, SCHEMA,
+from ckanext.dcat import utils
+from ckanext.dcat.processors import RDFSerializer
+from ckanext.dcat.profiles import (DCAT, DCT, ADMS, XSD, VCARD, FOAF, SCHEMA,
                                    SKOS, LOCN, GSP, OWL, SPDX, GEOJSON_IMT)
 
 eq_ = nose.tools.eq_
@@ -47,14 +47,14 @@ class BaseSerializeTest(object):
         return triples[0] if triples else None
 
 
-class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
+class TestEuroDCATAPProfileSerializeDataset(BaseSerializeTest):
 
     def test_graph_from_dataset(self):
 
         dataset = {
             'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
             'name': 'test-dataset',
-            'title': 'Test IAEST dataset',
+            'title': 'Test DCAT dataset',
             'notes': 'Lorem ipsum',
             'url': 'http://example.com/ds1',
             'version': '1.0b',
@@ -71,7 +71,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
                 {'key': 'access_rights', 'value': 'public'},
                 {'key': 'documentation', 'value': '[\"http://dataset.info.org/doc1\", \"http://dataset.info.org/doc2\"]'},
                 {'key': 'provenance', 'value': 'Some statement about provenance'},
-                {'key': 'iaest_type', 'value': 'test-type'},
+                {'key': 'dcat_type', 'value': 'test-type'},
                 {'key': 'related_resource', 'value': '[\"http://dataset.info.org/related1\", \"http://dataset.info.org/related2\"]'},
                 {'key': 'has_version', 'value': '[\"https://data.some.org/catalog/datasets/derived-dataset-1\", \"https://data.some.org/catalog/datasets/derived-dataset-2\"]'},
                 {'key': 'is_version_of', 'value': '[\"https://data.some.org/catalog/datasets/original-dataset\"]'},
@@ -89,7 +89,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
         eq_(unicode(dataset_ref), utils.dataset_uri(dataset))
 
         # Basic fields
-        assert self._triple(g, dataset_ref, RDF.type, IAEST.Dataset)
+        assert self._triple(g, dataset_ref, RDF.type, DCAT.Dataset)
         assert self._triple(g, dataset_ref, DCT.title, dataset['title'])
         assert self._triple(g, dataset_ref, DCT.description, dataset['notes'])
 
@@ -98,12 +98,12 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
         assert self._triple(g, dataset_ref, DCT.accrualPeriodicity, extras['frequency'])
         assert self._triple(g, dataset_ref, DCT.accessRights, extras['access_rights'])
         assert self._triple(g, dataset_ref, DCT.provenance, extras['provenance'])
-        assert self._triple(g, dataset_ref, DCT.type, extras['iaest_type'])
+        assert self._triple(g, dataset_ref, DCT.type, extras['dcat_type'])
 
         # Tags
-        eq_(len([t for t in g.triples((dataset_ref, IAEST.keyword, None))]), 2)
+        eq_(len([t for t in g.triples((dataset_ref, DCAT.keyword, None))]), 2)
         for tag in dataset['tags']:
-            assert self._triple(g, dataset_ref, IAEST.keyword, tag['name'])
+            assert self._triple(g, dataset_ref, DCAT.keyword, tag['name'])
 
         # Dates
         assert self._triple(g, dataset_ref, DCT.issued, dataset['metadata_created'], XSD.dateTime)
@@ -112,7 +112,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
         # List
         for item in [
             ('language', DCT.language, Literal),
-            ('theme', IAEST.theme, URIRef),
+            ('theme', DCAT.theme, URIRef),
             ('conforms_to', DCT.conformsTo, Literal),
             ('alternate_identifier', ADMS.identifier, Literal),
             ('documentation', FOAF.page, Literal),
@@ -217,7 +217,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
 
         # Contact details
 
-        contact_details = self._triple(g, dataset_ref, IAEST.contactPoint, None)[2]
+        contact_details = self._triple(g, dataset_ref, DCAT.contactPoint, None)[2]
         assert contact_details
         eq_(unicode(contact_details), extras['contact_uri'])
         assert self._triple(g, contact_details, VCARD.fn, extras['contact_name'])
@@ -238,7 +238,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        contact_details = self._triple(g, dataset_ref, IAEST.contactPoint, None)[2]
+        contact_details = self._triple(g, dataset_ref, DCAT.contactPoint, None)[2]
         assert contact_details
         assert_true(isinstance(contact_details, BNode))
         assert self._triple(g, contact_details, VCARD.fn, dataset['maintainer'])
@@ -257,7 +257,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        contact_details = self._triple(g, dataset_ref, IAEST.contactPoint, None)[2]
+        contact_details = self._triple(g, dataset_ref, DCAT.contactPoint, None)[2]
         assert contact_details
         assert_true(isinstance(contact_details, BNode))
         assert self._triple(g, contact_details, VCARD.fn, dataset['author'])
@@ -453,7 +453,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
         dataset = {
             'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
             'name': 'test-dataset',
-            'title': 'Test IAEST dataset',
+            'title': 'Test DCAT dataset',
             'resources': [
                 {
                     'id': 'c041c635-054f-4431-b647-f9186926d021',
@@ -479,15 +479,15 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        eq_(len([t for t in g.triples((dataset_ref, IAEST.distribution, None))]), 3)
+        eq_(len([t for t in g.triples((dataset_ref, DCAT.distribution, None))]), 3)
 
         for resource in dataset['resources']:
             distribution = self._triple(g,
                                         dataset_ref,
-                                        IAEST.distribution,
+                                        DCAT.distribution,
                                         URIRef(utils.resource_uri(resource)))[2]
 
-            assert self._triple(g, distribution, RDF.type, IAEST.Distribution)
+            assert self._triple(g, distribution, RDF.type, DCAT.Distribution)
             assert self._triple(g, distribution, DCT.title, resource['name'])
 
     def test_distribution_fields(self):
@@ -515,7 +515,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
         dataset = {
             'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
             'name': 'test-dataset',
-            'title': 'Test IAEST dataset',
+            'title': 'Test DCAT dataset',
             'resources': [
                 resource
             ]
@@ -526,14 +526,14 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        eq_(len([t for t in g.triples((dataset_ref, IAEST.distribution, None))]), 1)
+        eq_(len([t for t in g.triples((dataset_ref, DCAT.distribution, None))]), 1)
 
         # URI
-        distribution = self._triple(g, dataset_ref, IAEST.distribution, None)[2]
+        distribution = self._triple(g, dataset_ref, DCAT.distribution, None)[2]
         eq_(unicode(distribution), utils.resource_uri(resource))
 
         # Basic fields
-        assert self._triple(g, distribution, RDF.type, IAEST.Distribution)
+        assert self._triple(g, distribution, RDF.type, DCAT.Distribution)
         assert self._triple(g, distribution, DCT.title, resource['name'])
         assert self._triple(g, distribution, DCT.description, resource['description'])
         assert self._triple(g, distribution, DCT.rights, resource['rights'])
@@ -556,7 +556,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
         assert self._triple(g, distribution, DCT.modified, resource['modified'], XSD.dateTime)
 
         # Numbers
-        assert self._triple(g, distribution, IAEST.byteSize, float(resource['size']), XSD.decimal)
+        assert self._triple(g, distribution, DCAT.byteSize, float(resource['size']), XSD.decimal)
 
         # Checksum
         checksum = self._triple(g, distribution, SPDX.checksum, None)[2]
@@ -576,7 +576,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
         dataset = {
             'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
             'name': 'test-dataset',
-            'title': 'Test IAEST dataset',
+            'title': 'Test DCAT dataset',
             'resources': [
                 resource
             ]
@@ -587,9 +587,9 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        distribution = self._triple(g, dataset_ref, IAEST.distribution, None)[2]
+        distribution = self._triple(g, dataset_ref, DCAT.distribution, None)[2]
 
-        assert self._triple(g, distribution, IAEST.byteSize, resource['size'])
+        assert self._triple(g, distribution, DCAT.byteSize, resource['size'])
 
     def test_distribution_access_url_only(self):
 
@@ -603,7 +603,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
         dataset = {
             'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
             'name': 'test-dataset',
-            'title': 'Test IAEST dataset',
+            'title': 'Test DCAT dataset',
             'resources': [
                 resource
             ]
@@ -614,10 +614,10 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        distribution = self._triple(g, dataset_ref, IAEST.distribution, None)[2]
+        distribution = self._triple(g, dataset_ref, DCAT.distribution, None)[2]
 
-        assert self._triple(g, distribution, IAEST.accessURL, URIRef(resource['url']))
-        assert self._triple(g, distribution, IAEST.downloadURL, None) is None
+        assert self._triple(g, distribution, DCAT.accessURL, URIRef(resource['url']))
+        assert self._triple(g, distribution, DCAT.downloadURL, None) is None
 
     def test_distribution_download_url_only(self):
 
@@ -631,7 +631,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
         dataset = {
             'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
             'name': 'test-dataset',
-            'title': 'Test IAEST dataset',
+            'title': 'Test DCAT dataset',
             'resources': [
                 resource
             ]
@@ -642,10 +642,10 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        distribution = self._triple(g, dataset_ref, IAEST.distribution, None)[2]
+        distribution = self._triple(g, dataset_ref, DCAT.distribution, None)[2]
 
-        assert self._triple(g, distribution, IAEST.downloadURL, URIRef(resource['download_url']))
-        assert self._triple(g, distribution, IAEST.accessURL, None) is None
+        assert self._triple(g, distribution, DCAT.downloadURL, URIRef(resource['download_url']))
+        assert self._triple(g, distribution, DCAT.accessURL, None) is None
 
     def test_distribution_both_urls_different(self):
 
@@ -660,7 +660,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
         dataset = {
             'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
             'name': 'test-dataset',
-            'title': 'Test IAEST dataset',
+            'title': 'Test DCAT dataset',
             'resources': [
                 resource
             ]
@@ -671,10 +671,10 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        distribution = self._triple(g, dataset_ref, IAEST.distribution, None)[2]
+        distribution = self._triple(g, dataset_ref, DCAT.distribution, None)[2]
 
-        assert self._triple(g, distribution, IAEST.accessURL, URIRef( resource['url']))
-        assert self._triple(g, distribution, IAEST.downloadURL, URIRef(resource['download_url']))
+        assert self._triple(g, distribution, DCAT.accessURL, URIRef( resource['url']))
+        assert self._triple(g, distribution, DCAT.downloadURL, URIRef(resource['download_url']))
 
     def test_distribution_both_urls_the_same(self):
 
@@ -689,7 +689,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
         dataset = {
             'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
             'name': 'test-dataset',
-            'title': 'Test IAEST dataset',
+            'title': 'Test DCAT dataset',
             'resources': [
                 resource
             ]
@@ -700,10 +700,10 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        distribution = self._triple(g, dataset_ref, IAEST.distribution, None)[2]
+        distribution = self._triple(g, dataset_ref, DCAT.distribution, None)[2]
 
-        assert self._triple(g, distribution, IAEST.downloadURL, URIRef(resource['url']))
-        assert self._triple(g, distribution, IAEST.accessURL, None) is None
+        assert self._triple(g, distribution, DCAT.downloadURL, URIRef(resource['url']))
+        assert self._triple(g, distribution, DCAT.accessURL, None) is None
 
     def test_distribution_format(self):
 
@@ -719,7 +719,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
         dataset = {
             'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
             'name': 'test-dataset',
-            'title': 'Test IAEST dataset',
+            'title': 'Test DCAT dataset',
             'resources': [
                 resource
             ]
@@ -730,10 +730,10 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        distribution = self._triple(g, dataset_ref, IAEST.distribution, None)[2]
+        distribution = self._triple(g, dataset_ref, DCAT.distribution, None)[2]
 
         assert self._triple(g, distribution, DCT['format'], resource['format'])
-        assert self._triple(g, distribution, IAEST.mediaType, resource['mimetype'])
+        assert self._triple(g, distribution, DCAT.mediaType, resource['mimetype'])
 
     def test_distribution_format_with_backslash(self):
 
@@ -748,7 +748,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
         dataset = {
             'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
             'name': 'test-dataset',
-            'title': 'Test IAEST dataset',
+            'title': 'Test DCAT dataset',
             'resources': [
                 resource
             ]
@@ -759,9 +759,9 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        distribution = self._triple(g, dataset_ref, IAEST.distribution, None)[2]
+        distribution = self._triple(g, dataset_ref, DCAT.distribution, None)[2]
 
-        assert self._triple(g, distribution, IAEST.mediaType, resource['format'])
+        assert self._triple(g, distribution, DCAT.mediaType, resource['format'])
 
     def test_hash_algorithm_not_uri(self):
 
@@ -776,7 +776,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
         dataset = {
             'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
             'name': 'test-dataset',
-            'title': 'Test IAEST dataset',
+            'title': 'Test DCAT dataset',
             'resources': [
                 resource
             ]
@@ -787,7 +787,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        distribution = self._triple(g, dataset_ref, IAEST.distribution, None)[2]
+        distribution = self._triple(g, dataset_ref, DCAT.distribution, None)[2]
 
         checksum = self._triple(g, distribution, SPDX.checksum, None)[2]
         assert checksum
@@ -795,7 +795,7 @@ class TestEuroIAESTAPProfileSerializeDataset(BaseSerializeTest):
         assert self._triple(g, checksum, SPDX.algorithm, resource['hash_algorithm'])
 
 
-class TestEuroIAESTAPProfileSerializeCatalog(BaseSerializeTest):
+class TestEuroDCATAPProfileSerializeCatalog(BaseSerializeTest):
 
     @classmethod
     def teardown_class(cls):
@@ -811,7 +811,7 @@ class TestEuroIAESTAPProfileSerializeCatalog(BaseSerializeTest):
         eq_(unicode(catalog), utils.catalog_uri())
 
         # Basic fields
-        assert self._triple(g, catalog, RDF.type, IAEST.Catalog)
+        assert self._triple(g, catalog, RDF.type, DCAT.Catalog)
         assert self._triple(g, catalog, DCT.title, config.get('ckan.site_title'))
         assert self._triple(g, catalog, FOAF.homepage, URIRef(config.get('ckan.site_url')))
         assert self._triple(g, catalog, DCT.language, 'en')
@@ -833,7 +833,7 @@ class TestEuroIAESTAPProfileSerializeCatalog(BaseSerializeTest):
         eq_(unicode(catalog), utils.catalog_uri())
 
         # Basic fields
-        assert self._triple(g, catalog, RDF.type, IAEST.Catalog)
+        assert self._triple(g, catalog, RDF.type, DCAT.Catalog)
         assert self._triple(g, catalog, DCT.title, catalog_dict['title'])
         assert self._triple(g, catalog, DCT.description, catalog_dict['description'])
         assert self._triple(g, catalog, FOAF.homepage, URIRef(catalog_dict['homepage']))

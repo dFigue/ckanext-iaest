@@ -1,6 +1,6 @@
 import nose
 
-from ckanext.iaest.utils import parse_accept_header
+from ckanext.dcat.utils import parse_accept_header
 
 eq_ = nose.tools.eq_
 

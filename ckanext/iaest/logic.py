@@ -6,9 +6,9 @@ from dateutil.parser import parse as dateutil_parse
 
 from ckan.plugins import toolkit
 
-import ckanext.iaest.converters as converters
+import ckanext.dcat.converters as converters
 
-from ckanext.iaest.processors import RDFSerializer
+from ckanext.dcat.processors import RDFSerializer
 
 
 DATASETS_PER_PAGE = 100
@@ -17,9 +17,9 @@ wrong_page_exception = toolkit.ValidationError(
     'Page param must be a positive integer starting in 1')
 
 
-def iaest_dataset_show(context, data_dict):
+def dcat_dataset_show(context, data_dict):
 
-    toolkit.check_access('iaest_dataset_show', context, data_dict)
+    toolkit.check_access('dcat_dataset_show', context, data_dict)
 
     dataset_dict = toolkit.get_action('package_show')(context, data_dict)
 
@@ -32,9 +32,9 @@ def iaest_dataset_show(context, data_dict):
 
 
 @toolkit.side_effect_free
-def iaest_catalog_show(context, data_dict):
+def dcat_catalog_show(context, data_dict):
 
-    toolkit.check_access('iaest_catalog_show', context, data_dict)
+    toolkit.check_access('dcat_catalog_show', context, data_dict)
 
     query = _search_ckan_datasets(context, data_dict)
     dataset_dicts = query['results']
@@ -50,9 +50,9 @@ def iaest_catalog_show(context, data_dict):
 
 
 @toolkit.side_effect_free
-def iaest_catalog_search(context, data_dict):
+def dcat_catalog_search(context, data_dict):
 
-    toolkit.check_access('iaest_catalog_search', context, data_dict)
+    toolkit.check_access('dcat_catalog_search', context, data_dict)
 
     query = _search_ckan_datasets(context, data_dict)
 
@@ -69,19 +69,19 @@ def iaest_catalog_search(context, data_dict):
 
 
 @toolkit.side_effect_free
-def iaest_datasets_list(context, data_dict):
+def dcat_datasets_list(context, data_dict):
 
-    toolkit.check_access('iaest_datasets_list', context, data_dict)
+    toolkit.check_access('dcat_datasets_list', context, data_dict)
 
     ckan_datasets = _search_ckan_datasets(context, data_dict)['results']
 
-    return [converters.ckan_to_iaest(ckan_dataset)
+    return [converters.ckan_to_dcat(ckan_dataset)
             for ckan_dataset in ckan_datasets]
 
 
 def _search_ckan_datasets(context, data_dict):
 
-    n = int(config.get('ckanext.iaest.datasets_per_page', DATASETS_PER_PAGE))
+    n = int(config.get('ckanext.dcat.datasets_per_page', DATASETS_PER_PAGE))
     page = data_dict.get('page', 1) or 1
 
     try:
@@ -132,7 +132,7 @@ def _pagination_info(query, data_dict):
     The keys for the dictionary are:
 
     * `count` (total elements)
-    * `items_per_page` (`ckanext.iaest.datasets_per_page` or 100)
+    * `items_per_page` (`ckanext.dcat.datasets_per_page` or 100)
     * `current`
     * `first`
     * `last`
@@ -175,7 +175,7 @@ def _pagination_info(query, data_dict):
     if query['count'] == 0:
         return {}
 
-    items_per_page = int(config.get('ckanext.iaest.datasets_per_page',
+    items_per_page = int(config.get('ckanext.dcat.datasets_per_page',
                                     DATASETS_PER_PAGE))
     pagination_info = {
         'count': query['count'],
@@ -204,8 +204,8 @@ def _pagination_info(query, data_dict):
 
 
 @toolkit.auth_allow_anonymous_access
-def iaest_auth(context, data_dict):
+def dcat_auth(context, data_dict):
     '''
-    All users can access IAEST endpoints by default
+    All users can access DCAT endpoints by default
     '''
     return {'success': True}

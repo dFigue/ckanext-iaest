@@ -3,16 +3,16 @@ import nose
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import Namespace
 
-from ckanext.iaest.profiles import RDFProfile
+from ckanext.dcat.profiles import RDFProfile
 
-from ckanext.iaest.tests.test_base_parser import _default_graph
+from ckanext.dcat.tests.test_base_parser import _default_graph
 
 
 eq_ = nose.tools.eq_
 
 DCT = Namespace("http://purl.org/dc/terms/")
 TEST = Namespace("http://test.org/")
-IAEST = Namespace("http://www.w3.org/ns/iaest#")
+DCAT = Namespace("http://www.w3.org/ns/dcat#")
 ADMS = Namespace("http://www.w3.org/ns/adms#")
 
 
@@ -121,14 +121,14 @@ class TestBaseRDFProfile(object):
         p = RDFProfile(_default_graph())
 
         p.g.add((URIRef('http://example.org/datasets/1'),
-                 IAEST.keyword,
+                 DCAT.keyword,
                  Literal('space')))
         p.g.add((URIRef('http://example.org/datasets/1'),
-                 IAEST.keyword,
+                 DCAT.keyword,
                  Literal('moon')))
 
         value = p._object_value_list(URIRef('http://example.org/datasets/1'),
-                                     IAEST.keyword)
+                                     DCAT.keyword)
 
         assert isinstance(value, list)
         assert isinstance(value[0], unicode)

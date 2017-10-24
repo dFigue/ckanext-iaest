@@ -5,7 +5,7 @@ from pylons import config
 from ckan import plugins as p
 
 
-class GenerateStaticIAESTCommand(p.toolkit.CkanCommand):
+class GenerateStaticDCATCommand(p.toolkit.CkanCommand):
     """
     Generates static JSON files containing all datasets.
 
@@ -20,7 +20,7 @@ class GenerateStaticIAESTCommand(p.toolkit.CkanCommand):
     min_args = 2
 
     def __init__(self, name):
-        super(GenerateStaticIAESTCommand, self).__init__(name)
+        super(GenerateStaticDCATCommand, self).__init__(name)
 
     def command(self):
         self._load_config()
@@ -40,7 +40,7 @@ class GenerateStaticIAESTCommand(p.toolkit.CkanCommand):
     def generate(self, output):
         """
         Keep reading and converting datasets until we get an empty list back
-        from iaest_datasets_list
+        from dcat_datasets_list
         """
         data_dict = {'page': 0}
 
@@ -51,7 +51,7 @@ class GenerateStaticIAESTCommand(p.toolkit.CkanCommand):
                 try:
                     data_dict['page'] = data_dict['page'] + 1
                     datasets = \
-                        p.toolkit.get_action('iaest_datasets_list')({},
+                        p.toolkit.get_action('dcat_datasets_list')({},
                                                                    data_dict)
                 except p.toolkit.ValidationError, e:
                     self.log.exception(e)

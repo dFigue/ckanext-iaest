@@ -17,7 +17,7 @@ from ckanext.harvest.model import HarvestObject, HarvestObjectExtra
 log = logging.getLogger(__name__)
 
 
-class IAESTHarvester(HarvesterBase):
+class DCATHarvester(HarvesterBase):
 
     MAX_FILE_SIZE = 1024 * 1024 * 50  # 50 Mb
     CHUNK_SIZE = 1024
@@ -153,7 +153,7 @@ class IAESTHarvester(HarvesterBase):
 
     ## Start hooks
 
-    def modify_package_dict(self, package_dict, iaest_dict, harvest_object):
+    def modify_package_dict(self, package_dict, dcat_dict, harvest_object):
         '''
             Allows custom harvesters to modify the package dict before
             creating or updating the actual package.
@@ -163,7 +163,7 @@ class IAESTHarvester(HarvesterBase):
     ## End hooks
 
     def gather_stage(self,harvest_job):
-        log.debug('In IAESTHarvester gather_stage')
+        log.debug('In DCATHarvester gather_stage')
 
 
         ids = []
@@ -275,7 +275,7 @@ class IAESTHarvester(HarvesterBase):
         return True
 
     def import_stage(self,harvest_object):
-        log.debug('In IAESTHarvester import_stage')
+        log.debug('In DCATHarvester import_stage')
         if not harvest_object:
             log.error('No harvest object received')
             return False
@@ -311,7 +311,7 @@ class IAESTHarvester(HarvesterBase):
             previous_object.add()
 
 
-        package_dict, iaest_dict = self._get_package_dict(harvest_object)
+        package_dict, dcat_dict = self._get_package_dict(harvest_object)
         if not package_dict:
             return False
 
@@ -321,7 +321,7 @@ class IAESTHarvester(HarvesterBase):
         # Allow custom harvesters to modify the package dict before creating
         # or updating the package
         package_dict = self.modify_package_dict(package_dict,
-                                                iaest_dict,
+                                                dcat_dict,
                                                 harvest_object)
         # Unless already set by an extension, get the owner organization (if any)
         # from the harvest source dataset

@@ -10,7 +10,7 @@ try:
 except ImportError:
     from ckan.new_tests import helpers
 
-from ckanext.iaest.logic import _pagination_info
+from ckanext.dcat.logic import _pagination_info
 
 eq_ = nose.tools.eq_
 assert_raises = nose.tools.assert_raises
@@ -18,7 +18,7 @@ assert_raises = nose.tools.assert_raises
 
 class TestPagination(object):
 
-    @helpers.change_config('ckanext.iaest.datasets_per_page', 10)
+    @helpers.change_config('ckanext.dcat.datasets_per_page', 10)
     @helpers.change_config('ckan.site_url', 'http://example.com')
     @mock.patch('ckan.plugins.toolkit.request')
     def test_pagination(self, mock_request):
@@ -40,7 +40,7 @@ class TestPagination(object):
 
         eq_(pagination['count'], 12)
         eq_(pagination['items_per_page'],
-            config.get('ckanext.iaest.datasets_per_page'))
+            config.get('ckanext.dcat.datasets_per_page'))
         eq_(pagination['current'], 'http://example.com?page=1')
         eq_(pagination['first'], 'http://example.com?page=1')
         eq_(pagination['last'], 'http://example.com?page=2')
@@ -60,7 +60,7 @@ class TestPagination(object):
 
         eq_(pagination['count'], 12)
         eq_(pagination['items_per_page'],
-            config.get('ckanext.iaest.datasets_per_page'))
+            config.get('ckanext.dcat.datasets_per_page'))
         eq_(pagination['current'], 'http://example.com?page=1')
         eq_(pagination['first'], 'http://example.com?page=1')
         eq_(pagination['last'], 'http://example.com?page=2')
@@ -80,7 +80,7 @@ class TestPagination(object):
 
         eq_(pagination['count'], 12)
         eq_(pagination['items_per_page'],
-            config.get('ckanext.iaest.datasets_per_page'))
+            config.get('ckanext.dcat.datasets_per_page'))
         eq_(pagination['current'], 'http://example.com?page=2')
         eq_(pagination['first'], 'http://example.com?page=1')
         eq_(pagination['last'], 'http://example.com?page=2')
@@ -100,14 +100,14 @@ class TestPagination(object):
 
         eq_(pagination['count'], 12)
         eq_(pagination['items_per_page'],
-            config.get('ckanext.iaest.datasets_per_page'))
+            config.get('ckanext.dcat.datasets_per_page'))
         eq_(pagination['current'], 'http://example.com?page=3')
         eq_(pagination['first'], 'http://example.com?page=1')
         eq_(pagination['last'], 'http://example.com?page=2')
         eq_(pagination['previous'], 'http://example.com?page=2')
         assert 'next' not in pagination
 
-    @helpers.change_config('ckanext.iaest.datasets_per_page', 100)
+    @helpers.change_config('ckanext.dcat.datasets_per_page', 100)
     @helpers.change_config('ckan.site_url', 'http://example.com')
     @mock.patch('ckan.plugins.toolkit.request')
     def test_pagination_less_results_than_page_size(self, mock_request):
@@ -129,14 +129,14 @@ class TestPagination(object):
 
         eq_(pagination['count'], 12)
         eq_(pagination['items_per_page'],
-            config.get('ckanext.iaest.datasets_per_page'))
+            config.get('ckanext.dcat.datasets_per_page'))
         eq_(pagination['current'], 'http://example.com?page=1')
         eq_(pagination['first'], 'http://example.com?page=1')
         eq_(pagination['last'], 'http://example.com?page=1')
         assert 'next' not in pagination
         assert 'previous' not in pagination
 
-    @helpers.change_config('ckanext.iaest.datasets_per_page', 10)
+    @helpers.change_config('ckanext.dcat.datasets_per_page', 10)
     @helpers.change_config('ckan.site_url', 'http://example.com')
     @mock.patch('ckan.plugins.toolkit.request')
     def test_pagination_same_results_than_page_size(self, mock_request):
@@ -158,14 +158,14 @@ class TestPagination(object):
 
         eq_(pagination['count'], 10)
         eq_(pagination['items_per_page'],
-            config.get('ckanext.iaest.datasets_per_page'))
+            config.get('ckanext.dcat.datasets_per_page'))
         eq_(pagination['current'], 'http://example.com?page=1')
         eq_(pagination['first'], 'http://example.com?page=1')
         eq_(pagination['last'], 'http://example.com?page=1')
         assert 'next' not in pagination
         assert 'previous' not in pagination
 
-    @helpers.change_config('ckanext.iaest.datasets_per_page', 10)
+    @helpers.change_config('ckanext.dcat.datasets_per_page', 10)
     @helpers.change_config('ckan.site_url', 'http://example.com')
     @mock.patch('ckan.plugins.toolkit.request')
     def test_pagination_keeps_params(self, mock_request):
@@ -187,14 +187,14 @@ class TestPagination(object):
 
         eq_(pagination['count'], 12)
         eq_(pagination['items_per_page'],
-            config.get('ckanext.iaest.datasets_per_page'))
+            config.get('ckanext.dcat.datasets_per_page'))
         eq_(pagination['current'], 'http://example.com/feed/catalog.xml?a=1&b=2&page=1')
         eq_(pagination['first'], 'http://example.com/feed/catalog.xml?a=1&b=2&page=1')
         eq_(pagination['last'], 'http://example.com/feed/catalog.xml?a=1&b=2&page=2')
         eq_(pagination['next'], 'http://example.com/feed/catalog.xml?a=1&b=2&page=2')
         assert 'previous' not in pagination
 
-    @helpers.change_config('ckanext.iaest.datasets_per_page', 10)
+    @helpers.change_config('ckanext.dcat.datasets_per_page', 10)
     @helpers.change_config('ckan.site_url', '')
     @mock.patch('ckan.plugins.toolkit.request')
     def test_pagination_without_site_url(self, mock_request):
@@ -216,7 +216,7 @@ class TestPagination(object):
 
         eq_(pagination['count'], 12)
         eq_(pagination['items_per_page'],
-            config.get('ckanext.iaest.datasets_per_page'))
+            config.get('ckanext.dcat.datasets_per_page'))
         eq_(pagination['current'], 'http://ckan.example.com/feed/catalog.xml?page=1')
         eq_(pagination['first'], 'http://ckan.example.com/feed/catalog.xml?page=1')
         eq_(pagination['last'], 'http://ckan.example.com/feed/catalog.xml?page=2')

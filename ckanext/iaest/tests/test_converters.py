@@ -2,7 +2,7 @@ import os
 import json
 import difflib
 
-from ckanext.iaest import converters
+from ckanext.dcat import converters
 
 
 class TestConverters(object):
@@ -26,17 +26,17 @@ class TestConverters(object):
         return '\n' + '\n'.join([l for l in difflib.ndiff(d1_lines, d2_lines)
                                  if l.startswith(('-', '+'))])
 
-    def test_ckan_to_iaest(self):
+    def test_ckan_to_dcat(self):
         ckan_dict = self._get_file_as_dict('full_ckan_dataset.json')
-        expected_iaest_dict = self._get_file_as_dict('dataset.json')
+        expected_dcat_dict = self._get_file_as_dict('dataset.json')
 
-        iaest_dict = converters.ckan_to_iaest(ckan_dict)
+        dcat_dict = converters.ckan_to_dcat(ckan_dict)
 
-        assert iaest_dict == expected_iaest_dict, self._poor_mans_dict_diff(
-            expected_iaest_dict, iaest_dict)
+        assert dcat_dict == expected_dcat_dict, self._poor_mans_dict_diff(
+            expected_dcat_dict, dcat_dict)
 
-    def test_iaest_to_ckan(self):
-        iaest_dict = self._get_file_as_dict('dataset.json')
+    def test_dcat_to_ckan(self):
+        dcat_dict = self._get_file_as_dict('dataset.json')
         expected_ckan_dict = self._get_file_as_dict('ckan_dataset.json')
 
         # Pop CKAN specific fields
@@ -44,7 +44,7 @@ class TestConverters(object):
         expected_ckan_dict['resources'][0].pop('id', None)
         expected_ckan_dict['resources'][0].pop('package_id', None)
 
-        ckan_dict = converters.iaest_to_ckan(iaest_dict)
+        ckan_dict = converters.dcat_to_ckan(dcat_dict)
 
         assert ckan_dict == expected_ckan_dict, self._poor_mans_dict_diff(
             expected_ckan_dict, ckan_dict)
