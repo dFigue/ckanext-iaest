@@ -15,9 +15,9 @@ except ImportError:
 import ckanext.harvest.model as harvest_model
 from ckanext.harvest import queue
 
-from ckanext.dcat.harvesters import DCATRDFHarvester
-from ckanext.dcat.interfaces import IDCATRDFHarvester
-import ckanext.dcat.harvesters.rdf
+from ckanext.iaest.harvesters import IAESTRDFHarvester
+from ckanext.iaest.interfaces import IIAESTRDFHarvester
+import ckanext.iaest.harvesters.rdf
 
 
 eq_ = nose.tools.eq_
@@ -49,7 +49,7 @@ DCATRDFHarvester._get_content_and_type = _patched_get_content_and_type
 
 class TestRDFHarvester(p.SingletonPlugin):
 
-    p.implements(IDCATRDFHarvester)
+    p.implements(IIAESTRDFHarvester)
 
     calls = defaultdict(int)
 
@@ -91,7 +91,7 @@ class TestRDFHarvester(p.SingletonPlugin):
 
 
 class TestRDFNullHarvester(TestRDFHarvester):
-    p.implements(IDCATRDFHarvester)
+    p.implements(IIAESTRDFHarvester)
     def before_update(self, harvest_object, dataset_dict, temp_dict):
         super(TestRDFNullHarvester, self).before_update(harvest_object, dataset_dict, temp_dict)
         dataset_dict.clear()
@@ -102,7 +102,7 @@ class TestRDFNullHarvester(TestRDFHarvester):
 
 
 class TestRDFExceptionHarvester(TestRDFHarvester):
-    p.implements(IDCATRDFHarvester)
+    p.implements(IIAESTRDFHarvester)
 
     raised_exception = False
 
@@ -902,7 +902,7 @@ class TestDCATHarvestFunctional(FunctionalHarvestTest):
         assert ('Error parsing the RDF file'
                 in last_job_status['gather_error_summary'][0][0])
 
-    @patch.object(ckanext.dcat.harvesters.rdf.RDFParser, 'datasets')
+    @patch.object(ckanext.iaest.harvesters.rdf.RDFParser, 'datasets')
     def test_harvest_exception_in_profile(self, mock_datasets):
         mock_datasets.side_effect = Exception
 
@@ -1363,11 +1363,11 @@ class TestDCATRDFHarvester(object):
                 assert True
 
 
-class TestIDCATRDFHarvester(object):
+class TestIIAESTRDFHarvester(object):
 
     def test_before_download(self):
 
-        i = IDCATRDFHarvester()
+        i = IIAESTRDFHarvester()
 
         url = 'http://some.url'
 
@@ -1378,7 +1378,7 @@ class TestIDCATRDFHarvester(object):
 
     def test_after_download(self):
 
-        i = IDCATRDFHarvester()
+        i = IIAESTRDFHarvester()
 
         content = 'some.content'
 

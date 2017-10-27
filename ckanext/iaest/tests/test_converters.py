@@ -2,7 +2,7 @@ import os
 import json
 import difflib
 
-from ckanext.dcat import converters
+from ckanext.iaest import converters
 
 
 class TestConverters(object):

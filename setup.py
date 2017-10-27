@@ -1,21 +1,21 @@
 from setuptools import setup, find_packages
 
-version = '0.0.6'
+version = '0.0.1'
 
 setup(
-    name='ckanext-dcat',
+    name='ckanext-iaest',
     version=version,
-    description="Plugins for exposing and consuming DCAT metadata on CKAN",
+    description="Plugins for exposing and consuming DGA - IAEST metadata on CKAN",
     long_description='''\
     ''',
     classifiers=[],
     keywords='',
-    author='Open Knowledge Foundation',
-    author_email='info@ckan.org',
-    url='https://github.com/okfn/ckanext-dcat',
+    author='David Figueroa Alejandr',
+    author_email='i@ckan.org',
+    url='https://github.com/opendata/ckanext-iaest',
     license='AGPL',
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
-    namespace_packages=['ckanext', 'ckanext.dcat'],
+    namespace_packages=['ckanext', 'ckanext.iaest'],
     include_package_data=True,
     zip_safe=False,
     install_requires=[
@@ -24,28 +24,23 @@ setup(
     entry_points='''
 
     [ckan.plugins]
-    dcat_xml_harvester=ckanext.dcat.harvesters:DCATXMLHarvester
-    dcat_json_harvester=ckanext.dcat.harvesters:DCATJSONHarvester
-
-    dcat_rdf_harvester=ckanext.dcat.harvesters:DCATRDFHarvester
-
-    dcat_json_interface=ckanext.dcat.plugins:DCATJSONInterface
-
-    dcat=ckanext.dcat.plugins:DCATPlugin
+      
+    iaest_rdf_harvester=ckanext.iaest.harvesters:IAESTRDFHarvester
+    iaest=ckanext.iaest.plugins:IAESTPlugin
 
     # Test plugins
-    test_rdf_harvester=ckanext.dcat.tests.test_harvester:TestRDFHarvester
-    test_rdf_null_harvester=ckanext.dcat.tests.test_harvester:TestRDFNullHarvester
-    test_rdf_exception_harvester=ckanext.dcat.tests.test_harvester:TestRDFExceptionHarvester
+    #test_rdf_harvester=ckanext.iaest.tests.test_harvester:TestRDFHarvester
+    #test_rdf_null_harvester=ckanext.iaest.tests.test_harvester:TestRDFNullHarvester
+    #test_rdf_exception_harvester=ckanext.iaest.tests.test_harvester:TestRDFExceptionHarvester
 
-    [ckan.rdf.profiles]
-    euro_dcat_ap=ckanext.dcat.profiles:EuropeanDCATAPProfile
+    #[ckan.rdf.profiles]
+    #euro_dcat_ap=ckanext.iaest.profiles:EuropeanDCATAPProfile
 
-    [paste.paster_command]
-    generate_static = ckanext.dcat.commands:GenerateStaticDCATCommand
+    #[paste.paster_command]
+    #generate_static = ckanext.iaest.commands:GenerateStaticDCATCommand
 
-    [babel.extractors]
-    ckan = ckan.lib.extract:extract_ckan
+    #[babel.extractors]
+    #ckan = ckan.lib.extract:extract_ckan
     ''',
     message_extractors={
         'ckanext': [

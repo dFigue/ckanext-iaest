@@ -8,20 +8,20 @@ except ImportError:
         pass
 
 
-from ckanext.dcat.logic import (dcat_dataset_show,
-                                dcat_catalog_show,
-                                dcat_catalog_search,
-                                dcat_datasets_list,
-                                dcat_auth,
+from ckanext.iaest.logic import (iaest_dataset_show,
+                                iaest_catalog_show,
+                                iaest_catalog_search,
+                                iaest_datasets_list,
+                                iaest_auth,
                                 )
-from ckanext.dcat import utils
+from ckanext.iaest import utils
 
-DEFAULT_CATALOG_ENDPOINT = '/catalog.{_format}'
-CUSTOM_ENDPOINT_CONFIG = 'ckanext.dcat.catalog_endpoint'
-ENABLE_CONTENT_NEGOTIATION_CONFIG = 'ckanext.dcat.enable_content_negotiation'
+DEFAULT_CATALOG_ENDPOINT = '/catalog/iaest.{_format}'
+CUSTOM_ENDPOINT_CONFIG = 'ckanext.iaest.catalog_endpoint'
+ENABLE_CONTENT_NEGOTIATION_CONFIG = 'ckanext.iaest.enable_content_negotiation'
 
 
-class DCATPlugin(p.SingletonPlugin, DefaultTranslation):
+class IAESTPlugin(p.SingletonPlugin, DefaultTranslation):
 
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IRoutes, inherit=True)
@@ -53,15 +53,15 @@ class DCATPlugin(p.SingletonPlugin, DefaultTranslation):
     # IRoutes
     def before_map(self, _map):
 
-        controller = 'ckanext.dcat.controllers:DCATController'
+        controller = 'ckanext.iaest.controllers:DCATController'
 
-        _map.connect('dcat_catalog',
-                     config.get('ckanext.dcat.catalog_endpoint',
+        _map.connect('iaest_catalog',
+                     config.get('ckanext.iaest.catalog_endpoint',
                                 DEFAULT_CATALOG_ENDPOINT),
                      controller=controller, action='read_catalog',
                      requirements={'_format': 'xml|rdf|n3|ttl|jsonld'})
 
-        _map.connect('dcat_dataset', '/dataset/{_id}.{_format}',
+        _map.connect('iaest_dataset', '/dataset/iaest/{_id}.{_format}',
                      controller=controller, action='read_dataset',
                      requirements={'_format': 'xml|rdf|n3|ttl|jsonld'})
 
@@ -80,17 +80,17 @@ class DCATPlugin(p.SingletonPlugin, DefaultTranslation):
     # IActions
     def get_actions(self):
         return {
-            'dcat_dataset_show': dcat_dataset_show,
-            'dcat_catalog_show': dcat_catalog_show,
-            'dcat_catalog_search': dcat_catalog_search,
+            'iaest_dataset_show': iaest_dataset_show,
+            'iaest_catalog_show':iaest_catalog_show,
+            'iaest_catalog_search': iaest_catalog_search,
         }
 
     # IAuthFunctions
     def get_auth_functions(self):
         return {
-            'dcat_dataset_show': dcat_auth,
-            'dcat_catalog_show': dcat_auth,
-            'dcat_catalog_search': dcat_auth,
+            'iaest_dataset_show': iaest_auth,
+            'iaest_catalog_show': iaest_auth,
+            'iaest_catalog_search': iaest_auth,
         }
 
     # IPackageController
@@ -124,8 +124,8 @@ class DCATJSONInterface(p.SingletonPlugin):
     # IRoutes
     def after_map(self, map):
 
-        controller = 'ckanext.dcat.controllers:DCATController'
-        route = config.get('ckanext.dcat.json_endpoint', '/dcat.json')
+        controller = 'ckanext.iaest.controllers:DCATController'
+        route = config.get('ckanext.iaest.json_endpoint', '/dcat.json')
         map.connect(route, controller=controller, action='dcat_json')
 
         return map
@@ -133,11 +133,11 @@ class DCATJSONInterface(p.SingletonPlugin):
     # IActions
     def get_actions(self):
         return {
-            'dcat_datasets_list': dcat_datasets_list,
+            'iaest_datasets_list': iaest_datasets_list,
         }
 
     # IAuthFunctions
     def get_auth_functions(self):
         return {
-            'dcat_datasets_list': dcat_auth,
+            'iaest_datasets_list': iaest_auth,
         }

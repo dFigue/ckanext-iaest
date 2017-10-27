@@ -15,9 +15,9 @@ try:
 except ImportError:
     from ckan.new_tests import helpers, factories
 
-from ckanext.dcat.processors import RDFParser
-from ckanext.dcat.profiles import RDF, DCAT
-from ckanext.dcat.processors import HYDRA
+from ckanext.iaest.processors import RDFParser
+from ckanext.iaest.profiles import RDF, DCAT
+from ckanext.iaest.processors import HYDRA
 
 eq_ = nose.tools.eq_
 assert_true = nose.tools.assert_true
@@ -210,7 +210,7 @@ class TestEndpoints(helpers.FunctionalTestBase):
         for i in xrange(4):
             factories.Dataset()
 
-        url = url_for('dcat_catalog', _format='rdf')
+        url = url_for('iaest_catalog', _format='rdf')
 
         app = self._get_test_app()
 
@@ -234,7 +234,7 @@ class TestEndpoints(helpers.FunctionalTestBase):
         for i in xrange(4):
             factories.Dataset()
 
-        url = url_for('dcat_catalog', _format='ttl')
+        url = url_for('iaest_catalog', _format='ttl')
 
         app = self._get_test_app()
 
@@ -259,7 +259,7 @@ class TestEndpoints(helpers.FunctionalTestBase):
         time.sleep(1)
         dataset2 = factories.Dataset(title='Second dataset')
 
-        url = url_for('dcat_catalog',
+        url = url_for('iaest_catalog',
                       _format='ttl',
                       modified_since=dataset2['metadata_modified'])
 
@@ -281,7 +281,7 @@ class TestEndpoints(helpers.FunctionalTestBase):
 
     def test_catalog_modified_date_wrong_date(self):
 
-        url = url_for('dcat_catalog',
+        url = url_for('iaest_catalog',
                       _format='ttl',
                       modified_since='wrong_date')
 
@@ -297,7 +297,7 @@ class TestEndpoints(helpers.FunctionalTestBase):
 
         app = self._get_test_app()
 
-        url = url_for('dcat_catalog', _format='rdf')
+        url = url_for('iaest_catalog', _format='rdf')
 
         response = app.get(url)
 
@@ -315,13 +315,13 @@ class TestEndpoints(helpers.FunctionalTestBase):
         eq_(self._object_value(g, pagination, HYDRA.itemsPerPage), '10')
 
         eq_(self._object_value(g, pagination, HYDRA.firstPage),
-            url_for('dcat_catalog', _format='rdf', page=1, host='test.ckan.net'))
+            url_for('iaest_catalog', _format='rdf', page=1, host='test.ckan.net'))
 
         eq_(self._object_value(g, pagination, HYDRA.nextPage),
-            url_for('dcat_catalog', _format='rdf', page=2, host='test.ckan.net'))
+            url_for('iaest_catalog', _format='rdf', page=2, host='test.ckan.net'))
 
         eq_(self._object_value(g, pagination, HYDRA.lastPage),
-            url_for('dcat_catalog', _format='rdf', page=2, host='test.ckan.net'))
+            url_for('iaest_catalog', _format='rdf', page=2, host='test.ckan.net'))
 
 
 class TestAcceptHeader(helpers.FunctionalTestBase):

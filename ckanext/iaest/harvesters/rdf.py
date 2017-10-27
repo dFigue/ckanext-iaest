@@ -12,23 +12,23 @@ import ckan.lib.plugins as lib_plugins
 
 from ckanext.harvest.model import HarvestObject, HarvestObjectExtra
 
-from ckanext.dcat.harvesters.base import DCATHarvester
+from ckanext.iaest.harvesters.base import IAESTHarvester
 
-from ckanext.dcat.processors import RDFParserException, RDFParser
+from ckanext.iaest.processors import RDFParserException, RDFParser
 
-from ckanext.dcat.interfaces import IDCATRDFHarvester
+from ckanext.iaest.interfaces import IIAESTRDFHarvester
 
 
 log = logging.getLogger(__name__)
 
 
-class DCATRDFHarvester(DCATHarvester):
+class IAESTRDFHarvester(IAESTHarvester):
 
     def info(self):
         return {
-            'name': 'dcat_rdf',
-            'title': 'Generic DCAT RDF Harvester',
-            'description': 'Harvester for DCAT datasets from an RDF graph'
+            'name': 'iaest_rdf',
+            'title': 'Generic IAEST RDF Harvester',
+            'description': 'Harvester for IAEST datasets from an RDF graph'
         }
 
     def _get_guid(self, dataset_dict, source_url=None):
@@ -164,7 +164,7 @@ class DCATRDFHarvester(DCATHarvester):
         last_content_hash = None
 
         while next_page_url:
-            for harvester in p.PluginImplementations(IDCATRDFHarvester):
+            for harvester in p.PluginImplementations(IIAESTRDFHarvester):
                 next_page_url, before_download_errors = harvester.before_download(next_page_url, harvest_job)
 
                 for error_msg in before_download_errors:
@@ -187,7 +187,7 @@ class DCATRDFHarvester(DCATHarvester):
                 last_content_hash = content_hash
 
             # TODO: store content?
-            for harvester in p.PluginImplementations(IDCATRDFHarvester):
+            for harvester in p.PluginImplementations(IIAESTRDFHarvester):
                 content, after_download_errors = harvester.after_download(content, harvest_job)
 
                 for error_msg in after_download_errors:
@@ -254,7 +254,7 @@ class DCATRDFHarvester(DCATHarvester):
 
     def import_stage(self, harvest_object):
 
-        log.debug('In DCATRDFHarvester import_stage')
+        log.debug('In DCATRDFHarvester import_stage DAVID')
 
         status = self._get_object_extra(harvest_object, 'status')
         if status == 'delete':
@@ -319,7 +319,7 @@ class DCATRDFHarvester(DCATHarvester):
                     if res_uri and res_uri in resource_mapping:
                         resource['id'] = resource_mapping[res_uri]
 
-                for harvester in p.PluginImplementations(IDCATRDFHarvester):
+                for harvester in p.PluginImplementations(IIAESTRDFHarvester):
                     harvester.before_update(harvest_object, dataset, harvester_tmp_dict)
 
                 try:
@@ -336,7 +336,7 @@ class DCATRDFHarvester(DCATHarvester):
                     self._save_object_error('Update validation Error: %s' % str(e.error_summary), harvest_object, 'Import')
                     return False
 
-                for harvester in p.PluginImplementations(IDCATRDFHarvester):
+                for harvester in p.PluginImplementations(IIAESTRDFHarvester):
                     err = harvester.after_update(harvest_object, dataset, harvester_tmp_dict)
 
                     if err:
@@ -358,7 +358,7 @@ class DCATRDFHarvester(DCATHarvester):
                 harvester_tmp_dict = {}
 
                 name = dataset['name']
-                for harvester in p.PluginImplementations(IDCATRDFHarvester):
+                for harvester in p.PluginImplementations(IIAESTRDFHarvester):
                     harvester.before_create(harvest_object, dataset, harvester_tmp_dict)
 
                 try:
@@ -381,7 +381,7 @@ class DCATRDFHarvester(DCATHarvester):
                     self._save_object_error('Create validation Error: %s' % str(e.error_summary), harvest_object, 'Import')
                     return False
 
-                for harvester in p.PluginImplementations(IDCATRDFHarvester):
+                for harvester in p.PluginImplementations(IIAESTRDFHarvester):
                     err = harvester.after_create(harvest_object, dataset, harvester_tmp_dict)
 
                     if err:

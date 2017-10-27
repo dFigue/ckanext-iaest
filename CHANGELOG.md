@@ -8,5 +8,5 @@
 * Support for pagination on RDF Harvester (#70)
 * Add missing DCAT fields on the serialization, dct:type and dct:provenance (#71)
 * Add MANIFEST.in to ensure i18n files are include in package (#76)
-* Add before/after create/update hooks to IDCATRDFHarvester (#77)
+* Add before/after create/update hooks to IIAESTRDFHarvester (#77)
 * Fix serialization of numeric values (#73)

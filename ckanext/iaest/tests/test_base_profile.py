@@ -3,9 +3,9 @@ import nose
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import Namespace
 
-from ckanext.dcat.profiles import RDFProfile
+from ckanext.iaest.profiles import RDFProfile
 
-from ckanext.dcat.tests.test_base_parser import _default_graph
+from ckanext.iaest.tests.test_base_parser import _default_graph
 
 
 eq_ = nose.tools.eq_

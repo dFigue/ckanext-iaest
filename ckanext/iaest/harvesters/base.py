@@ -17,7 +17,7 @@ from ckanext.harvest.model import HarvestObject, HarvestObjectExtra
 log = logging.getLogger(__name__)
 
 
-class DCATHarvester(HarvesterBase):
+class IAESTHarvester (HarvesterBase):
 
     MAX_FILE_SIZE = 1024 * 1024 * 50  # 50 Mb
     CHUNK_SIZE = 1024

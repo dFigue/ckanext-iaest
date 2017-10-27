@@ -40,7 +40,7 @@ class GenerateStaticDCATCommand(p.toolkit.CkanCommand):
     def generate(self, output):
         """
         Keep reading and converting datasets until we get an empty list back
-        from dcat_datasets_list
+        from iaest_datasets_list
         """
         data_dict = {'page': 0}
 
@@ -51,7 +51,7 @@ class GenerateStaticDCATCommand(p.toolkit.CkanCommand):
                 try:
                     data_dict['page'] = data_dict['page'] + 1
                     datasets = \
-                        p.toolkit.get_action('dcat_datasets_list')({},
+                        p.toolkit.get_action('iaest_datasets_list')({},
                                                                    data_dict)
                 except p.toolkit.ValidationError, e:
                     self.log.exception(e)

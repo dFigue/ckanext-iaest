@@ -67,7 +67,7 @@ def catalog_uri():
 
     The value will be the first found of:
 
-        1. The `ckanext.dcat.base_uri` config option (recommended)
+        1. The `ckanext.iaest.base_uri` config option (recommended)
         2. The `ckan.site_url` config option
         3. `http://` + the `app_instance_uuid` config option (minus brackets)
 
@@ -76,7 +76,7 @@ def catalog_uri():
     Returns a string with the catalog URI.
     '''
 
-    uri = config.get('ckanext.dcat.base_uri')
+    uri = config.get('ckanext.iaest.base_uri')
     if not uri:
         uri = config.get('ckan.site_url')
     if not uri:
@@ -84,11 +84,11 @@ def catalog_uri():
         if app_uuid:
             uri = 'http://' + app_uuid.replace('{', '').replace('}', '')
             log.critical('Using app id as catalog URI, you should set the ' +
-                         '`ckanext.dcat.base_uri` or `ckan.site_url` option')
+                         '`ckanext.iaest.base_uri` or `ckan.site_url` option')
         else:
             uri = 'http://' + str(uuid.uuid4())
             log.critical('Using a random id as catalog URI, you should set ' +
-                         'the `ckanext.dcat.base_uri` or `ckan.site_url` ' +
+                         'the `ckanext.iaest.base_uri` or `ckan.site_url` ' +
                          'option')
 
     return uri

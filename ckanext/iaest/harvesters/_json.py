@@ -2,13 +2,13 @@ import json
 import logging
 from hashlib import sha1
 
-from ckanext.dcat import converters
-from ckanext.dcat.harvesters.base import DCATHarvester
+from ckanext.iaest import converters
+from ckanext.iaest.harvesters.base import IAESTHarvester
 
 log = logging.getLogger(__name__)
 
 
-class DCATJSONHarvester(DCATHarvester):
+class IAESTJSONHarvester(IAESTHarvester):
 
     def info(self):
         return {

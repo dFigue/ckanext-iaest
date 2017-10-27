@@ -14,7 +14,7 @@ from geomet import wkt, InvalidGeoJSONException
 from ckan.model.license import LicenseRegister
 from ckan.plugins import toolkit
 
-from ckanext.dcat.utils import resource_uri, publisher_uri_from_dataset_dict
+from ckanext.iaest.utils import resource_uri, publisher_uri_from_dataset_dict
 
 DCT = Namespace("http://purl.org/dc/terms/")
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
@@ -670,6 +670,7 @@ class EuropeanDCATAPProfile(RDFProfile):
                 ('access_rights', DCT.accessRights),
                 ('provenance', DCT.provenance),
                 ('dcat_type', DCT.type),
+                ('granularity',DCAT),
                 ):
             value = self._object_value(dataset_ref, predicate)
             if value:
@@ -777,7 +778,7 @@ class EuropeanDCATAPProfile(RDFProfile):
 
             # Format and media type
             normalize_ckan_format = config.get(
-                'ckanext.dcat.normalize_ckan_format', True)
+                'ckanext.iaest.normalize_ckan_format', True)
             imt, label = self._distribution_format(distribution,
                                                    normalize_ckan_format)
 
@@ -847,6 +848,7 @@ class EuropeanDCATAPProfile(RDFProfile):
             ('access_rights', DCT.accessRights, None, Literal),
             ('dcat_type', DCT.type, None, Literal),
             ('provenance', DCT.provenance, None, Literal),
+            ('tema_estadistico',DCAT.tema_estadistico,None,Literal),
         ]
         self._add_triples_from_dict(dataset_dict, dataset_ref, items)
 

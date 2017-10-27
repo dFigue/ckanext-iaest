@@ -15,9 +15,9 @@ try:
 except ImportError:
     from ckan.new_tests import helpers, factories
 
-from ckanext.dcat import utils
-from ckanext.dcat.processors import RDFSerializer
-from ckanext.dcat.profiles import (DCAT, DCT, ADMS, XSD, VCARD, FOAF, SCHEMA,
+from ckanext.iaest import utils
+from ckanext.iaest.processors import RDFSerializer
+from ckanext.iaest.profiles import (DCAT, DCT, ADMS, XSD, VCARD, FOAF, SCHEMA,
                                    SKOS, LOCN, GSP, OWL, SPDX, GEOJSON_IMT)
 
 eq_ = nose.tools.eq_

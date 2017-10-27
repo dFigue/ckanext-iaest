@@ -30,9 +30,12 @@ def dcat_to_ckan(dcat_dict):
         package_dict['extras'].append({'key': 'dcat_publisher_email', 'value': dcat_publisher.get('mbox')})
 
     package_dict['extras'].append({
-        'key': 'language',
+        'key': 'language-PEPE',
         'value': ','.join(dcat_dict.get('language', []))
     })
+
+    for extra in dcat_dict.get('extras', []):
+        package_dict['extras'].append({'name': extra.get('key'),'value':extra.get('value')})
 
     package_dict['resources'] = []
     for distribution in dcat_dict.get('distribution', []):

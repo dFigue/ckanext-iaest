@@ -1,4 +1,4 @@
-from ckanext.dcat.harvesters.rdf import DCATRDFHarvester
+from ckanext.iaest.harvesters.rdf import IAESTRDFHarvester
 
-from ckanext.dcat.harvesters.xml import DCATXMLHarvester
-from ckanext.dcat.harvesters._json import DCATJSONHarvester
+from ckanext.iaest.harvesters.xml import IAESTXMLHarvester
+from ckanext.iaest.harvesters._json import IAESTJSONHarvester

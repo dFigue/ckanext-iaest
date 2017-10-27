@@ -1,7 +1,7 @@
 from ckan.plugins.interfaces import Interface
 
 
-class IDCATRDFHarvester(Interface):
+class IIAESTRDFHarvester(Interface):
 
     def before_download(self, url, harvest_job):
         '''

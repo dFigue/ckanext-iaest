@@ -9,7 +9,7 @@ more details:
 '''
 
 
-class DCATXMLHarvester(p.SingletonPlugin):
+class IAESTXMLHarvester(p.SingletonPlugin):
 
     p.implements(p.IConfigurer, inherit=True)
 

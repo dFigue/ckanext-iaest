@@ -5,7 +5,7 @@ from pylons import config
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import Namespace, RDF
 
-from ckanext.dcat.processors import (
+from ckanext.iaest.processors import (
     RDFParser,
     RDFParserException,
     RDFProfileException,
@@ -13,7 +13,7 @@ from ckanext.dcat.processors import (
     RDF_PROFILES_CONFIG_OPTION
 )
 
-from ckanext.dcat.profiles import RDFProfile
+from ckanext.iaest.profiles import RDFProfile
 
 DCT = Namespace("http://purl.org/dc/terms/")
 DCAT = Namespace("http://www.w3.org/ns/dcat#")

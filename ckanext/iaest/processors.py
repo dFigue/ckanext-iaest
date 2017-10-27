@@ -13,15 +13,15 @@ from rdflib.namespace import Namespace, RDF
 
 import ckan.plugins as p
 
-from ckanext.dcat.utils import catalog_uri, dataset_uri, url_to_rdflib_format
+from ckanext.iaest.utils import catalog_uri, dataset_uri, url_to_rdflib_format
 
 
 HYDRA = Namespace('http://www.w3.org/ns/hydra/core#')
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
 
 RDF_PROFILES_ENTRY_POINT_GROUP = 'ckan.rdf.profiles'
-RDF_PROFILES_CONFIG_OPTION = 'ckanext.dcat.rdf.profiles'
-COMPAT_MODE_CONFIG_OPTION = 'ckanext.dcat.compatibility_mode'
+RDF_PROFILES_CONFIG_OPTION = 'ckanext.iaest.rdf.profiles'
+COMPAT_MODE_CONFIG_OPTION = 'ckanext.iaest.compatibility_mode'
 
 DEFAULT_RDF_PROFILES = ['euro_dcat_ap']
 

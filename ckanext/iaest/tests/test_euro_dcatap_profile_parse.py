@@ -13,8 +13,8 @@ try:
 except ImportError:
     from ckan.new_tests import helpers
 
-from ckanext.dcat.processors import RDFParser
-from ckanext.dcat.profiles import (DCAT, DCT, ADMS, LOCN, SKOS, GSP, RDFS,
+from ckanext.iaest.processors import RDFParser
+from ckanext.iaest.profiles import (DCAT, DCT, ADMS, LOCN, SKOS, GSP, RDFS,
                                    GEOJSON_IMT)
 
 eq_ = nose.tools.eq_
@@ -348,7 +348,7 @@ class TestEuroDCATAPProfileParsing(BaseParseTest):
         else:
             eq_(resource['format'], u'text/csv')
 
-    @helpers.change_config('ckanext.dcat.normalize_ckan_format', False)
+    @helpers.change_config('ckanext.iaest.normalize_ckan_format', False)
     def test_distribution_format_imt_only_normalize_false(self):
         g = Graph()
 
@@ -371,7 +371,7 @@ class TestEuroDCATAPProfileParsing(BaseParseTest):
         eq_(resource['format'], u'text/csv')
         eq_(resource['mimetype'], u'text/csv')
 
-    @helpers.change_config('ckanext.dcat.normalize_ckan_format', False)
+    @helpers.change_config('ckanext.iaest.normalize_ckan_format', False)
     def test_distribution_format_format_only_normalize_false(self):
         g = Graph()
 
