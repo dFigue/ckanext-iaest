@@ -60,6 +60,7 @@ class RDFProcessor(object):
         log.debug('Cargando profiles %s',profiles)
         self._profiles = self._load_profiles(profiles)
         if not self._profiles:
+            log.debug('Error al cargar el profile')
             raise RDFProfileException(
                 'No suitable RDF profiles could be loaded')
 
