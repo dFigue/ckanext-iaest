@@ -336,7 +336,7 @@ class RDFProfile(object):
             license_title2id = {}
             for license_id, license in LicenseRegister().items():
                 log.debug('License_id %s, License %s',license_id,license)
-                 log.debug('License.url %s, License.title %s',license.url,license.title)
+                log.debug('License.url %s, License.title %s',license.url,license.title)
                 license_uri2id[license.url] = license_id
                 license_title2id[license.title] = license_id
             self._licenceregister_cache = license_uri2id, license_title2id
