@@ -650,7 +650,7 @@ class EuropeanDCATAPProfile(RDFProfile):
             value = self._object_value(dataset_ref, ADMS.version)
             if value:
                 dataset_dict['version'] = value
-        log.debug('version obtenida: %s',dataset_dict['version'])
+                log.debug('version obtenida: %s',dataset_dict['version'])
         # Tags
         keywords = self._object_value_list(dataset_ref, DCAT.keyword) or []
         # Split keywords with commas
