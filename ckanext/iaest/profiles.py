@@ -337,6 +337,7 @@ class RDFProfile(object):
                 license_title_final = license.title
                 break;
         
+        log.debug('Licencias que se insertan en el dataset: %s, %s ',license_id,license_title)
         dataset_dict['license_id'] = license_id
         dataset_dict['license_title'] = license_title       
         return
@@ -742,6 +743,7 @@ class EuropeanDCATAPProfile(RDFProfile):
        
         self._license(dataset_ref)
        
+        log.debug('Procesando resources')
         # Resources
         for distribution in self._distributions(dataset_ref):
 
