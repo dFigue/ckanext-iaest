@@ -83,7 +83,7 @@ class RDFProcessor(object):
 
         for profile_name in profile_names:
             log.debug('Iterando para profile_name %s',profile_name)
-            log.debug('Iter_entry_points %s',iter_entry_points)
+            
             for profile in iter_entry_points(
                     group=RDF_PROFILES_ENTRY_POINT_GROUP,
                     name=profile_name):

@@ -627,12 +627,13 @@ class EuropeanDCATAPProfile(RDFProfile):
     '''
 
     def parse_dataset(self, dataset_dict, dataset_ref):
-        log.error('Parsing Dataset with IAEST DCAT Profile')
+        log.debug('Parsing Dataset with IAEST DCAT Profile')
         dataset_dict['tags'] = []
         dataset_dict['extras'] = []
         dataset_dict['resources'] = []
 
         # Basic fields
+        log.debug('Parsing Basic Fields')
         for key, predicate in (
                 ('title', DCT.title),
                 ('notes', DCT.description),
@@ -643,12 +644,13 @@ class EuropeanDCATAPProfile(RDFProfile):
             if value:
                 dataset_dict[key] = value
 
+        log.debug('version')
         if not dataset_dict.get('version'):
             # adms:version was supported on the first version of the DCAT-AP
             value = self._object_value(dataset_ref, ADMS.version)
             if value:
                 dataset_dict['version'] = value
-
+        log.debug('version obtenida: %s',dataset_dict['version'])
         # Tags
         keywords = self._object_value_list(dataset_ref, DCAT.keyword) or []
         # Split keywords with commas
@@ -663,6 +665,7 @@ class EuropeanDCATAPProfile(RDFProfile):
         # Extras
 
         #  Simple values
+        log.debug('Obteniendo simple values')
         for key, predicate in (
                 ('issued', DCT.issued),
                 ('modified', DCT.modified),
@@ -675,6 +678,7 @@ class EuropeanDCATAPProfile(RDFProfile):
                 ('granularity',DCAT),
                 ):
             value = self._object_value(dataset_ref, predicate)
+            log.debug(' Key: %s Value:%s',key,value)
             if value:
                 dataset_dict['extras'].append({'key': key, 'value': value})
 
