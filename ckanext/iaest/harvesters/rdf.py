@@ -205,11 +205,12 @@ class IAESTRDFHarvester(IAESTHarvester):
                 self._save_gather_error('Error parsing the RDF file: {0}'.format(e), harvest_job)
                 return []
 
+            log.warning('Parser complete.')
             try:
                 for dataset in parser.datasets():
                     if not dataset.get('name'):
                         dataset['name'] = self._gen_new_name(dataset['title'])
-
+                    log.warning('Generando dataset: {0}'.format(dataset['name']) )
                     # Unless already set by the parser, get the owner organization (if any)
                     # from the harvest source dataset
                     if not dataset.get('owner_org'):
