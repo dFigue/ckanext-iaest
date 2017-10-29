@@ -254,7 +254,7 @@ class IAESTRDFHarvester(IAESTHarvester):
 
     def import_stage(self, harvest_object):
 
-        log.debug('In DCATRDFHarvester import_stage DAVID 12345678910')
+        log.debug('In DCATRDFHarvester import_stage DAVID23')
 
         status = self._get_object_extra(harvest_object, 'status')
         if status == 'delete':
