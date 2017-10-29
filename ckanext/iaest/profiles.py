@@ -335,7 +335,7 @@ class RDFProfile(object):
                 return license_id,license.title
 
         log.debug('No se encontro la licencia')
-        return ''
+        return '',''
            
         '''   license_uri2id[license.url] = license_id
            license_title2id[license.title] = license_id
@@ -735,10 +735,15 @@ class EuropeanDCATAPProfile(RDFProfile):
 
         #TODO REVISAR
         # License
-        if 'license_id' not in dataset_dict:
-            license_id,license_title = self._license(dataset_ref)
+       
+        license_id,license_title = self._license(dataset_ref)
+        if license_id,license_title:
+            log.debug(' License_id: %s License_title:%s',license_id,license_title)
             dataset_dict['license_id'] = license_id
             dataset_dict['license_title'] = license_title
+        else:
+            dataset_dict['license_id'] = ''
+            dataset_dict['license_title'] = ''
 
         # Resources
         for distribution in self._distributions(dataset_ref):
