@@ -327,6 +327,20 @@ class RDFProfile(object):
         one.
         '''
         log.debug('Obteniendo licencias')
+
+        license = self._object(dataset_ref, DCT.license)
+        log.debug('Licencia Obtenida: ',license)
+        for license_id, license in LicenseRegister().items():
+            if license_id == license:
+                return license_id,license.title
+
+        log.debug('No se encontro la licencia')
+        return ''
+           
+        '''   license_uri2id[license.url] = license_id
+           license_title2id[license.title] = license_id
+
+
         if self._licenceregister_cache is not None:
             log.debug('Ya existe la cache de licencias')
             license_uri2id, license_title2id = self._licenceregister_cache
@@ -355,6 +369,7 @@ class RDFProfile(object):
             if license_id:
                 return license_id
         return ''
+    '''
 
     def _distribution_format(self, distribution, normalize_ckan_format=True):
         '''
