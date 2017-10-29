@@ -344,9 +344,11 @@ class RDFProfile(object):
        
         # If distribution has a license, attach it to the dataset
         license = self._object(dataset_ref, DCT.license)
+        log.debug('Licencia Obtenida: ',license)
         if license:
             # Try to find a matching license comparing URIs, then titles
             license_id = license_uri2id.get(license.toPython())
+            log.debug('License_id: ',license_id)
             if not license_id:
                 license_id = license_title2id.get(
                     self._object_value(license, DCT.title))
