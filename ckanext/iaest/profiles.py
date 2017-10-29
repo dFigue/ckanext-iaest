@@ -679,16 +679,17 @@ class EuropeanDCATAPProfile(RDFProfile):
                 log.debug('version obtenida: %s',dataset_dict['version'])
        
         # Extras       
+        #TODO Revisar los 0X_ porque alguno deben llevar acentos.
         log.debug('Obteniendo Extras')
         for key, predicate in (
-                ('01_IAEST_Tema estadístico', DCAT.tema_estadistico),
+                ('01_IAEST_Tema estadistico', DCAT.tema_estadistico),
                 ('04_IAEST_Unidad de medida', DCAT.unidad_medida),
                 ('06_IAEST_Periodo base', DCAT.periodo_base),
-                ('07_IAEST_Tipo de operación', DCAT.tipo_operacion),
-                ('08_IAEST_Tipología de datos de origen', DCAT.tipologia_datos_origen),
+                ('07_IAEST_Tipo de operacion', DCAT.tipo_operacion),
+                ('08_IAEST_Tipologia de datos de origen', DCAT.tipologia_datos_origen),
                 ('09_IAEST_Fuente', DCAT.fuente),
-                ('11_IAEST_Tratamiento estadístico', DCAT.tratamiento_estadistico),
-                ('5_IAEST_Legislación UE', DCAT.legislacion_ue),                
+                ('11_IAEST_Tratamiento estadistico', DCAT.tratamiento_estadistico),
+                ('5_IAEST_Legislacion UE', DCAT.legislacion_ue),                
                 ('Data Dictionary URL0',DCAT.urlDictionary),                
                 ('Granularity',DCAT.granularity),
                 ('LangES',DCAT.language),                
