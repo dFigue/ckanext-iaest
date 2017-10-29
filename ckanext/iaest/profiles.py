@@ -328,7 +328,7 @@ class RDFProfile(object):
         '''
         log.debug('Obteniendo licencias')
 
-        license_id_rdf = self.self._object_value(dataset_ref, DCT.license)
+        license_id_rdf = self._object_value(dataset_ref, DCT.license)
         log.debug('Licencia Obtenida: %s ',license_id_rdf)
         for license_id, license in LicenseRegister().items():
             if license_id == license_id_rdf:
