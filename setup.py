@@ -33,7 +33,7 @@ setup(
     #test_rdf_null_harvester=ckanext.iaest.tests.test_harvester:TestRDFNullHarvester
     #test_rdf_exception_harvester=ckanext.iaest.tests.test_harvester:TestRDFExceptionHarvester
 
-    #[ckan.rdf.profiles]
+    [ckan.rdf.profiles]
     euro_dcat_ap_iaest=ckanext.iaest.profiles:EuropeanDCATAPProfile
 
     #[paste.paster_command]
