@@ -2,6 +2,7 @@ import sys
 import argparse
 import xml
 import json
+import logging
 from pkg_resources import iter_entry_points
 
 from pylons import config
@@ -25,6 +26,7 @@ COMPAT_MODE_CONFIG_OPTION = 'ckanext.iaest.compatibility_mode'
 
 DEFAULT_RDF_PROFILES = ['euro_dcat_ap_iaest']
 
+log = logging.getLogger(__name__)
 
 class RDFParserException(Exception):
     pass
@@ -48,12 +50,14 @@ class RDFProcessor(object):
         of JSON dumps).
 
         '''
+        log.debug('Inicializando processor')
         if not profiles:
             profiles = config.get(RDF_PROFILES_CONFIG_OPTION, None)
             if profiles:
                 profiles = profiles.split(' ')
             else:
                 profiles = DEFAULT_RDF_PROFILES
+        log.debug('Cargando profiles %s',profiles)
         self._profiles = self._load_profiles(profiles)
         if not self._profiles:
             raise RDFProfileException(
@@ -63,7 +67,7 @@ class RDFProcessor(object):
             compatibility_mode = p.toolkit.asbool(
                 config.get(COMPAT_MODE_CONFIG_OPTION, False))
         self.compatibility_mode = compatibility_mode
-
+        log.debug('Invocando a rdflib.Graph')
         self.g = rdflib.Graph()
 
     def _load_profiles(self, profile_names):
@@ -73,13 +77,16 @@ class RDFProcessor(object):
         These are registered on ``entry_points`` in setup.py, under the
         ``[ckan.rdf.profiles]`` group.
         '''
+        log.debug('_load_profiles')
         profiles = []
         loaded_profiles_names = []
 
         for profile_name in profile_names:
+            log.debug('Iterando para profile_name %s',profile_name)
             for profile in iter_entry_points(
                     group=RDF_PROFILES_ENTRY_POINT_GROUP,
                     name=profile_name):
+                log.debug('Cargando profile %s',profile)
                 profile_class = profile.load()
                 # Set a reference to the profile name
                 profile_class.name = profile.name
