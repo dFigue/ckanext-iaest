@@ -150,7 +150,7 @@ class IAESTRDFHarvester(IAESTHarvester):
 
     def gather_stage(self, harvest_job):
 
-        log.debug('In DCATRDFHarvester gather_stage')
+        log.debug('In IAESTRDFHarvester gather_stage')
 
         rdf_format = None
         if harvest_job.source.config:

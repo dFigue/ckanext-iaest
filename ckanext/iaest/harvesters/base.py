@@ -54,10 +54,9 @@ class IAESTHarvester (HarvesterBase):
                 url = url + '&' if '?' in url else url + '?'
                 url = url + 'page={0}'.format(page)
 
-            log.debug('123456')
+           
             log.debug('Getting file %s', url)
-            log.debug('TESTING')
-
+            
             # first we try a HEAD request which may not be supported
             did_get = False
             r = requests.head(url)

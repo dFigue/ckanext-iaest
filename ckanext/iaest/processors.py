@@ -23,7 +23,7 @@ RDF_PROFILES_ENTRY_POINT_GROUP = 'ckan.rdf.profiles'
 RDF_PROFILES_CONFIG_OPTION = 'ckanext.iaest.rdf.profiles'
 COMPAT_MODE_CONFIG_OPTION = 'ckanext.iaest.compatibility_mode'
 
-DEFAULT_RDF_PROFILES = ['euro_dcat_ap']
+DEFAULT_RDF_PROFILES = ['euro_dcat_ap_iaest']
 
 
 class RDFParserException(Exception):

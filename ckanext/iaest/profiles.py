@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 
 from dateutil.parser import parse as parse_date
 
@@ -44,6 +45,7 @@ namespaces = {
     'owl': OWL,
 }
 
+log = logging.getLogger(__name__)
 
 class RDFProfile(object):
     '''Base class with helper methods for implementing RDF parsing profiles
@@ -625,7 +627,7 @@ class EuropeanDCATAPProfile(RDFProfile):
     '''
 
     def parse_dataset(self, dataset_dict, dataset_ref):
-
+        log.error('Parsing Dataset with IAEST DCAT Profile')
         dataset_dict['tags'] = []
         dataset_dict['extras'] = []
         dataset_dict['resources'] = []

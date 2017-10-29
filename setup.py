@@ -34,7 +34,7 @@ setup(
     #test_rdf_exception_harvester=ckanext.iaest.tests.test_harvester:TestRDFExceptionHarvester
 
     #[ckan.rdf.profiles]
-    #euro_dcat_ap=ckanext.iaest.profiles:EuropeanDCATAPProfile
+    euro_dcat_ap_iaest=ckanext.iaest.profiles:EuropeanDCATAPProfile
 
     #[paste.paster_command]
     #generate_static = ckanext.iaest.commands:GenerateStaticDCATCommand
