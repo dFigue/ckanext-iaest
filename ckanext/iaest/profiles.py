@@ -668,7 +668,7 @@ class EuropeanDCATAPProfile(RDFProfile):
         publisher = self._publisher(dataset_ref, DCT.publisher)
         dataset_dict['maintainer'] = publisher.get('title')   
         dataset_dict['author'] = publisher.get('title')    
-        dataset_dict['author_email'] = elf._object_value(dataset_ref, DCAT.author_email)
+        dataset_dict['author_email'] = self._object_value(dataset_ref, DCAT.author_email)
 
         log.debug('version')
         if not dataset_dict.get('version'):
