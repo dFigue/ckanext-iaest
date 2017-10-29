@@ -235,6 +235,8 @@ class RDFProfile(object):
 
             publisher['type'] = self._object_value(agent, DCT.type)
 
+            publisher['title'] = self._object_value(agent, DCT.title)
+
         return publisher
 
     def _contact_details(self, subject, predicate):
@@ -324,27 +326,32 @@ class RDFProfile(object):
         that if distributions have different licenses we'll only get the first
         one.
         '''
+        log.debug('Obteniendo licencias')
         if self._licenceregister_cache is not None:
+            log.debug('Ya existe la cache de licencias')
             license_uri2id, license_title2id = self._licenceregister_cache
         else:
+            log.debug('Creando cache de licencias')
             license_uri2id = {}
             license_title2id = {}
             for license_id, license in LicenseRegister().items():
+                log.debug('License_id %s, License %s',license_id,license)
+                 log.debug('License.url %s, License.title %s',license.url,license.title)
                 license_uri2id[license.url] = license_id
                 license_title2id[license.title] = license_id
             self._licenceregister_cache = license_uri2id, license_title2id
 
-        for distribution in self._distributions(dataset_ref):
-            # If distribution has a license, attach it to the dataset
-            license = self._object(distribution, DCT.license)
-            if license:
-                # Try to find a matching license comparing URIs, then titles
-                license_id = license_uri2id.get(license.toPython())
-                if not license_id:
-                    license_id = license_title2id.get(
-                        self._object_value(license, DCT.title))
-                if license_id:
-                    return license_id
+       
+        # If distribution has a license, attach it to the dataset
+        license = self._object(dataset_ref, DCT.license)
+        if license:
+            # Try to find a matching license comparing URIs, then titles
+            license_id = license_uri2id.get(license.toPython())
+            if not license_id:
+                license_id = license_title2id.get(
+                    self._object_value(license, DCT.title))
+            if license_id:
+                return license_id
         return ''
 
     def _distribution_format(self, distribution, normalize_ckan_format=True):
@@ -632,25 +639,7 @@ class EuropeanDCATAPProfile(RDFProfile):
         dataset_dict['extras'] = []
         dataset_dict['resources'] = []
 
-        # Basic fields
-        log.debug('Parsing Basic Fields')
-        for key, predicate in (
-                ('title', DCT.title),
-                ('notes', DCT.description),
-                ('url', DCAT.landingPage),
-                ('version', OWL.versionInfo),
-                ):
-            value = self._object_value(dataset_ref, predicate)
-            if value:
-                dataset_dict[key] = value
-
-        log.debug('version')
-        if not dataset_dict.get('version'):
-            # adms:version was supported on the first version of the DCAT-AP
-            value = self._object_value(dataset_ref, ADMS.version)
-            if value:
-                dataset_dict['version'] = value
-                log.debug('version obtenida: %s',dataset_dict['version'])
+        log.debug('Parsing Keyword')
         # Tags
         keywords = self._object_value_list(dataset_ref, DCAT.keyword) or []
         # Split keywords with commas
@@ -662,81 +651,64 @@ class EuropeanDCATAPProfile(RDFProfile):
         for keyword in keywords:
             dataset_dict['tags'].append({'name': keyword})
 
-        # Extras
-
-        #  Simple values
-        log.debug('Obteniendo simple values')
+        # Basic fields
+        log.debug('Parsing Basic Fields')
         for key, predicate in (
-                ('issued', DCT.issued),
-                ('modified', DCT.modified),
-                ('identifier', DCT.identifier),
-                ('version_notes', ADMS.versionNotes),
-                ('frequency', DCT.accrualPeriodicity),
-                ('access_rights', DCT.accessRights),
-                ('provenance', DCT.provenance),
-                ('dcat_type', DCT.dcat_type),
-                ('granularity',DCAT.granularity),
+                ('title', DCT.title),
+                ('notes', DCT.description),
+                ('url', DCAT.landingPage),
+                ('version', OWL.versionInfo),                
+                ):
+            value = self._object_value(dataset_ref, predicate)
+            if value:
+                dataset_dict[key] = value
+
+        # Publisher
+        log.debug('Parsing publisher')
+        publisher = self._publisher(dataset_ref, DCT.publisher)
+        dataset_dict['maintainer'] = publisher.get('title')   
+        dataset_dict['author'] = publisher.get('title')    
+        dataset_dict['author_email'] = elf._object_value(dataset_ref, DCAT.author_email)
+
+        log.debug('version')
+        if not dataset_dict.get('version'):
+            # adms:version was supported on the first version of the DCAT-AP
+            value = self._object_value(dataset_ref, ADMS.version)
+            if value:
+                dataset_dict['version'] = value
+                log.debug('version obtenida: %s',dataset_dict['version'])
+       
+        # Extras       
+        log.debug('Obteniendo Extras')
+        for key, predicate in (
+                ('01_IAEST_Tema estadístico', DCAT.tema_estadistico),
+                ('04_IAEST_Unidad de medida', DCAT.unidad_medida),
+                ('06_IAEST_Periodo base', DCAT.periodo_base),
+                ('07_IAEST_Tipo de operación', DCAT.tipo_operacion),
+                ('08_IAEST_Tipología de datos de origen', DCAT.tipologia_datos_origen),
+                ('09_IAEST_Fuente', DCAT.fuente),
+                ('11_IAEST_Tratamiento estadístico', DCAT.tratamiento_estadistico),
+                ('5_IAEST_Legislación UE', DCAT.legislacion_ue),                
+                ('Data Dictionary URL0',DCAT.urlDictionary),                
+                ('Granularity',DCAT.granularity),
+                ('LangES',DCAT.language),
+                #('PX_maxPosition',DCAT.granularity),
+                ('Spatial',DCT.spatial),
+                ('TemporalFrom',DCT.temporalFrom),
+                ('TemporalUntil',DCT.TemporalUntil),
+                ('nameAragopedia',DCAT.name_aragopedia),
+                ('shortUriAragopedia',DCAT.short_uri_aragopedia),
+                ('typeAragopedia',DCAT.type_aragopedia),
+                ('uriAragopedia',DCAT.uri_aragopedia),               
                 ):
             value = self._object_value(dataset_ref, predicate)
             log.debug(' Key: %s Value:%s',key,value)
             if value:
                 dataset_dict['extras'].append({'key': key, 'value': value})
+                if key == 'Data Dictionary URL0':
+                    dataset_dict['extras'].append({'key': 'Data Dictionary', 'value': 'El diccionario del dato se encuentra en la siguiente url'})
 
-        #  Lists
-        for key, predicate, in (
-                ('language', DCT.language),
-                ('theme', DCAT.theme),
-                ('alternate_identifier', ADMS.identifier),
-                ('conforms_to', DCT.conformsTo),
-                ('documentation', FOAF.page),
-                ('related_resource', DCT.relation),
-                ('has_version', DCT.hasVersion),
-                ('is_version_of', DCT.isVersionOf),
-                ('source', DCT.source),
-                ('sample', ADMS.sample),
-                ):
-            values = self._object_value_list(dataset_ref, predicate)
-            if values:
-                dataset_dict['extras'].append({'key': key,
-                                               'value': json.dumps(values)})
-
-        # Contact details
-        contact = self._contact_details(dataset_ref, DCAT.contactPoint)
-        if not contact:
-            # adms:contactPoint was supported on the first version of DCAT-AP
-            contact = self._contact_details(dataset_ref, ADMS.contactPoint)
-
-        if contact:
-            for key in ('uri', 'name', 'email'):
-                if contact.get(key):
-                    dataset_dict['extras'].append(
-                        {'key': 'contact_{0}'.format(key),
-                         'value': contact.get(key)})
-
-        # Publisher
-        publisher = self._publisher(dataset_ref, DCT.publisher)
-        for key in ('uri', 'name', 'email', 'url', 'type'):
-            if publisher.get(key):
-                dataset_dict['extras'].append(
-                    {'key': 'publisher_{0}'.format(key),
-                     'value': publisher.get(key)})
-
-        # Temporal
-        start, end = self._time_interval(dataset_ref, DCT.temporal)
-        if start:
-            dataset_dict['extras'].append(
-                {'key': 'temporal_start', 'value': start})
-        if end:
-            dataset_dict['extras'].append(
-                {'key': 'temporal_end', 'value': end})
-
-        # Spatial
-        spatial = self._spatial(dataset_ref, DCT.spatial)
-        for key in ('uri', 'text', 'geom'):
-            if spatial.get(key):
-                dataset_dict['extras'].append(
-                    {'key': 'spatial_{0}'.format(key) if key != 'geom' else 'spatial',
-                     'value': spatial.get(key)})
+        #Obtener frecuency del nodo accrualPeridicity
 
         # Dataset URI (explicitly show the missing ones)
         dataset_uri = (unicode(dataset_ref)
@@ -744,6 +716,7 @@ class EuropeanDCATAPProfile(RDFProfile):
                        else '')
         dataset_dict['extras'].append({'key': 'uri', 'value': dataset_uri})
 
+        #TODO REVISAR
         # License
         if 'license_id' not in dataset_dict:
             dataset_dict['license_id'] = self._license(dataset_ref)
