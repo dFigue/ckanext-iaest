@@ -89,6 +89,8 @@ class IAESTHarvester (HarvesterBase):
             if content_type is None and r.headers.get('content-type'):
                 content_type = r.headers.get('content-type').split(";", 1)[0]
 
+            log.debug('Contenido obtenido %s', content)
+
             return content, content_type
 
         except requests.exceptions.HTTPError, error:
@@ -99,15 +101,18 @@ class IAESTHarvester (HarvesterBase):
             msg = 'Could not get content from %s. Server responded with %s %s' % (
                 url, error.response.status_code, error.response.reason)
             self._save_gather_error(msg, harvest_job)
+            log.debug('Getting file %s', msg)
             return None, None
         except requests.exceptions.ConnectionError, error:
             msg = '''Could not get content from %s because a
                                 connection error occurred. %s''' % (url, error)
             self._save_gather_error(msg, harvest_job)
+            log.debug('Getting file %s', msg)
             return None, None
         except requests.exceptions.Timeout, error:
             msg = 'Could not get content from %s because the connection timed out.' % url
             self._save_gather_error(msg, harvest_job)
+            log.debug('Getting file %s', msg)
             return None, None
 
     def _get_user_name(self):
