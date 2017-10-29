@@ -56,6 +56,7 @@ class IAESTHarvester (HarvesterBase):
 
 
             log.debug('Getting file %s', url)
+            log.debug('TESTING')
 
             # first we try a HEAD request which may not be supported
             did_get = False
