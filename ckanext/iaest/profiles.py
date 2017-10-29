@@ -674,8 +674,8 @@ class EuropeanDCATAPProfile(RDFProfile):
                 ('frequency', DCT.accrualPeriodicity),
                 ('access_rights', DCT.accessRights),
                 ('provenance', DCT.provenance),
-                ('dcat_type', DCT.type),
-                ('granularity',DCAT),
+                ('dcat_type', DCT.dcat_type),
+                ('granularity',DCAT.granularity),
                 ):
             value = self._object_value(dataset_ref, predicate)
             log.debug(' Key: %s Value:%s',key,value)
