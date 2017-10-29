@@ -54,7 +54,7 @@ class IAESTHarvester (HarvesterBase):
                 url = url + '&' if '?' in url else url + '?'
                 url = url + 'page={0}'.format(page)
 
-
+            log.debug('123456')
             log.debug('Getting file %s', url)
             log.debug('TESTING')
 
