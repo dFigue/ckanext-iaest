@@ -289,7 +289,7 @@ class RDFSerializer(RDFProcessor):
 
         Returns a string with the serialized dataset
         '''
-
+        log.debug('Entrando en serialize_dataset')
         self.graph_from_dataset(dataset_dict)
 
         _format = url_to_rdflib_format(_format)
@@ -323,7 +323,8 @@ class RDFSerializer(RDFProcessor):
 
         Returns a string with the serialized catalog
         '''
-
+        log.debug('Entrando en serialize_catalog')
+        
         catalog_ref = self.graph_from_catalog(catalog_dict)
         if dataset_dicts:
             for dataset_dict in dataset_dicts:

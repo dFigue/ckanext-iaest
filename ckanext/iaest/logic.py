@@ -7,9 +7,11 @@ from dateutil.parser import parse as dateutil_parse
 from ckan.plugins import toolkit
 
 import ckanext.iaest.converters as converters
+import logging
 
 from ckanext.iaest.processors import RDFSerializer
 
+log = logging.getLogger(__name__)
 
 DATASETS_PER_PAGE = 100
 
@@ -19,6 +21,7 @@ wrong_page_exception = toolkit.ValidationError(
 
 def iaest_dataset_show(context, data_dict):
 
+    log.debug('Entrando en iaest_dataset_show')
     toolkit.check_access('iaest_dataset_show', context, data_dict)
 
     dataset_dict = toolkit.get_action('package_show')(context, data_dict)
@@ -33,7 +36,7 @@ def iaest_dataset_show(context, data_dict):
 
 @toolkit.side_effect_free
 def iaest_catalog_show(context, data_dict):
-
+    log.debug('Entrando en iaest_catalog_show')
     toolkit.check_access('iaest_catalog_show', context, data_dict)
 
     query = _search_ckan_datasets(context, data_dict)

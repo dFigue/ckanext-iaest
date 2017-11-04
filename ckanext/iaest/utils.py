@@ -188,7 +188,7 @@ def publisher_uri_from_dataset_dict(dataset_dict):
                 break
     if not uri and dataset_dict.get('organization'):
         uri = '{0}/organization/{1}'.format(catalog_uri().rstrip('/'),
-                                            dataset_dict['organization']['id'])
+                                            dataset_dict['organization']['name'])
 
     return uri
 

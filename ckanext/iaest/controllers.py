@@ -1,4 +1,5 @@
 import json
+import logging
 
 from ckan.plugins import toolkit
 
@@ -11,6 +12,7 @@ from ckan.controllers.home import HomeController
 
 from ckanext.iaest.utils import CONTENT_TYPES, parse_accept_header
 
+log = logging.getLogger(__name__)
 
 def check_access_header():
     _format = None
@@ -25,7 +27,7 @@ def check_access_header():
 class DCATController(BaseController):
 
     def read_catalog(self, _format=None):
-
+        log.debug('Leyendo catalog')
         if not _format:
             _format = check_access_header()
 
@@ -46,7 +48,7 @@ class DCATController(BaseController):
             toolkit.abort(409, str(e))
 
     def read_dataset(self, _id, _format=None):
-
+        log.debug('Leyendo dataset')
         if not _format:
             _format = check_access_header()
 

@@ -13,9 +13,10 @@ from rdflib.namespace import Namespace, RDF, XSD, SKOS, RDFS
 from geomet import wkt, InvalidGeoJSONException
 
 from ckan.model.license import LicenseRegister
+from ckan.model.group import Group
 from ckan.plugins import toolkit
 
-from ckanext.iaest.utils import resource_uri, publisher_uri_from_dataset_dict
+from ckanext.iaest.utils import resource_uri, publisher_uri_from_dataset_dict,catalog_uri
 
 DCT = Namespace("http://purl.org/dc/terms/")
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
@@ -31,6 +32,12 @@ SPDX = Namespace('http://spdx.org/rdf/terms#')
 
 GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'
 
+RDFS = Namespace("http://www.w3.org/2000/01/rdf-schema#") 
+RDF = Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#") 
+DC = Namespace("http://purl.org/dc/elements/1.1/") 
+DBPEDIA = Namespace("http://dbpedia.org/ontology/") 
+ARAGODEF = Namespace("http://opendata.aragon.es/def/Aragopedia.html") 
+
 namespaces = {
     'dct': DCT,
     'dcat': DCAT,
@@ -43,6 +50,11 @@ namespaces = {
     'locn': LOCN,
     'gsp': GSP,
     'owl': OWL,
+    'rdfs': RDFS,
+    'rdf': RDF,
+    'dc': DC,
+    'dbpedia': DBPEDIA,
+    'aragodef': ARAGODEF
 }
 
 log = logging.getLogger(__name__)
@@ -92,6 +104,12 @@ class RDFProfile(object):
         '''
         for distribution in self.g.objects(dataset, DCAT.distribution):
             yield distribution
+
+    def _themes(self, dataset):      
+        '''
+        '''
+        for themes in self.g.objects(dataset, DCAT.theme):
+            yield themes
 
     def _object(self, subject, predicate):
         '''
@@ -332,49 +350,16 @@ class RDFProfile(object):
         license_id_rdf = self._object_value(dataset_ref, DCT.license)
         log.debug('Licencia Obtenida: %s ',license_id_rdf)
         for license_id, license in LicenseRegister().items():
+            log.debug('Tratando licencia: %s ',license_id)
             if license_id == license_id_rdf:
+                log.debug('Encontrada licencia')
                 license_id_final = license_id
                 license_title_final = license.title
-                break;
+                break
         
-        log.debug('Licencias que se insertan en el dataset: %s, %s ',license_id,license_title)
-        dataset_dict['license_id'] = license_id
-        dataset_dict['license_title'] = license_title       
-        return
-           
-        '''   license_uri2id[license.url] = license_id
-           license_title2id[license.title] = license_id
-
-
-        if self._licenceregister_cache is not None:
-            log.debug('Ya existe la cache de licencias')
-            license_uri2id, license_title2id = self._licenceregister_cache
-        else:
-            log.debug('Creando cache de licencias')
-            license_uri2id = {}
-            license_title2id = {}
-            for license_id, license in LicenseRegister().items():
-                log.debug('License_id %s, License %s',license_id,license)
-                log.debug('License.url %s, License.title %s',license.url,license.title)
-                license_uri2id[license.url] = license_id
-                license_title2id[license.title] = license_id
-            self._licenceregister_cache = license_uri2id, license_title2id
-
-       
-        # If distribution has a license, attach it to the dataset
-        license = self._object(dataset_ref, DCT.license)
-        log.debug('Licencia Obtenida: ',license)
-        if license:
-            # Try to find a matching license comparing URIs, then titles
-            license_id = license_uri2id.get(license.toPython())
-            log.debug('License_id: ',license_id)
-            if not license_id:
-                license_id = license_title2id.get(
-                    self._object_value(license, DCT.title))
-            if license_id:
-                return license_id
-        return ''
-    '''
+        log.debug('Licencias que se insertan en el dataset: %s, %s ',license_id_final,license_title_final)
+      
+        return license_id_final,license_title_final
 
     def _distribution_format(self, distribution, normalize_ckan_format=True):
         '''
@@ -660,6 +645,7 @@ class EuropeanDCATAPProfile(RDFProfile):
         dataset_dict['tags'] = []
         dataset_dict['extras'] = []
         dataset_dict['resources'] = []
+        dataset_dict['groups'] = []
 
         log.debug('Parsing Keyword')
         # Tags
@@ -691,6 +677,7 @@ class EuropeanDCATAPProfile(RDFProfile):
         dataset_dict['maintainer'] = publisher.get('title')   
         dataset_dict['author'] = publisher.get('title')    
         dataset_dict['author_email'] = self._object_value(dataset_ref, DCAT.author_email)
+        dataset_dict['url'] = publisher.get('url')    
 
         log.debug('version')
         if not dataset_dict.get('version'):
@@ -717,7 +704,7 @@ class EuropeanDCATAPProfile(RDFProfile):
                 ('LangES',DCAT.language),                
                 ('Spatial',DCT.spatial),
                 ('TemporalFrom',DCT.temporalFrom),
-                ('TemporalUntil',DCT.TemporalUntil),
+                ('TemporalUntil',DCT.temporalUntil),
                 ('nameAragopedia',DCAT.name_aragopedia),
                 ('shortUriAragopedia',DCAT.short_uri_aragopedia),
                 ('typeAragopedia',DCAT.type_aragopedia),
@@ -736,13 +723,29 @@ class EuropeanDCATAPProfile(RDFProfile):
         dataset_uri = (unicode(dataset_ref)
                        if isinstance(dataset_ref, rdflib.term.URIRef)
                        else '')
-        dataset_dict['extras'].append({'key': 'uri', 'value': dataset_uri})
+        #dataset_dict['extras'].append({'key': 'uri', 'value': dataset_uri})
 
-        #TODO REVISAR
+       
         # License
        
-        self._license(dataset_ref)
+        license_id_final,license_title_final = self._license(dataset_ref)
+        log.debug('Licencias obtenidas %s,%s',license_id_final,license_title_final)
+        dataset_dict['license_id'] = license_id_final
+        dataset_dict['license_title'] = license_title_final 
+
        
+        log.debug('Tratando themes: ...')
+        for theme in self._themes(dataset_ref):
+            theme_id = self._object_value(theme, DCT.identifier)
+            log.debug('identifier: %s',theme_id)
+            if theme_id:
+                log.debug('Grupo incluido en RDF: %s',theme_id)
+                group = Group.get(theme_id)
+
+                log.debug('Grupo id: %s',group.id )
+                dataset_dict['groups'].append({'id':group.id})
+                log.debug('dataset_dict[groups]: %s',dataset_dict['groups'])
+
         log.debug('Procesando resources')
         # Resources
         for distribution in self._distributions(dataset_ref):
@@ -831,32 +834,40 @@ class EuropeanDCATAPProfile(RDFProfile):
 
     def graph_from_dataset(self, dataset_dict, dataset_ref):
 
+        log.debug('Iniciando graph_from_dataset')
         g = self.g
 
         for prefix, namespace in namespaces.iteritems():
+            log.debug('Binding namespace %s with prefix %s',namespace,prefix)
             g.bind(prefix, namespace)
 
         g.add((dataset_ref, RDF.type, DCAT.Dataset))
 
-        # Basic fields
-        items = [
-            ('title', DCT.title, None, Literal),
-            ('notes', DCT.description, None, Literal),
-            ('url', DCAT.landingPage, None, URIRef),
-            ('identifier', DCT.identifier, ['guid', 'id'], Literal),
-            ('version', OWL.versionInfo, ['dcat_version'], Literal),
-            ('version_notes', ADMS.versionNotes, None, Literal),
-            ('frequency', DCT.accrualPeriodicity, None, Literal),
-            ('access_rights', DCT.accessRights, None, Literal),
-            ('dcat_type', DCT.type, None, Literal),
-            ('provenance', DCT.provenance, None, Literal),
-            ('tema_estadistico',DCAT.tema_estadistico,None,Literal),
-        ]
-        self._add_triples_from_dict(dataset_dict, dataset_ref, items)
+        log.debug('Insertando title')
+        #Insertamos el titulo con lang es
+        title = dataset_dict.get('title')
+        g.add((dataset_ref, DCT.title, Literal(title,lang='es')))
 
+        log.debug('Insertando description')
+        #Insertamos el titulo con lang es
+        notes = dataset_dict.get('notes')
+        g.add((dataset_ref, DCT.description, Literal(notes,lang='es')))
+
+        log.debug('Insertando theme')
+        #Insertamos los grupos
+        #TODO En el RDF original se anade un rdf:resource
+        for group in dataset_dict.get('groups'):
+             g.add((dataset_ref, DCAT.theme, Literal(group['display_name'])))
+        
         # Tags
         for tag in dataset_dict.get('tags', []):
-            g.add((dataset_ref, DCAT.keyword, Literal(tag['name'])))
+            g.add((dataset_ref, DCAT.keyword, Literal(tag['name'],lang='es')))
+
+        #Identifier
+        #TODO Pasar la url por configuracion
+        dataset_name = dataset_dict.get('name')
+        dataset_identifier = '{0}/catalogo/{1}'.format(catalog_uri().rstrip('/'),dataset_name)
+        g.add((dataset_ref, DCT.identifier, Literal(dataset_identifier,datatype='http://www.w3.org/2001/XMLSchema#anyURI')))
 
         # Dates
         items = [
@@ -865,214 +876,135 @@ class EuropeanDCATAPProfile(RDFProfile):
         ]
         self._add_date_triples_from_dict(dataset_dict, dataset_ref, items)
 
-        #  Lists
-        items = [
-            ('language', DCT.language, None, Literal),
-            ('theme', DCAT.theme, None, URIRef),
-            ('conforms_to', DCT.conformsTo, None, Literal),
-            ('alternate_identifier', ADMS.identifier, None, Literal),
-            ('documentation', FOAF.page, None, Literal),
-            ('related_resource', DCT.relation, None, Literal),
-            ('has_version', DCT.hasVersion, None, Literal),
-            ('is_version_of', DCT.isVersionOf, None, Literal),
-            ('source', DCT.source, None, Literal),
-            ('sample', ADMS.sample, None, Literal),
-        ]
-        self._add_list_triples_from_dict(dataset_dict, dataset_ref, items)
+        publisher_uri = '{0}/catalogo/{1}'.format(catalog_uri().rstrip('/'),dataset_dict['organization']['name'])
+            
+        if publisher_uri:
+            publisher_details = URIRef(publisher_uri)
+        else:
+            # No organization nor publisher_uri
+            publisher_details = BNode()
 
-        # Contact details
-        if any([
-            self._get_dataset_value(dataset_dict, 'contact_uri'),
-            self._get_dataset_value(dataset_dict, 'contact_name'),
-            self._get_dataset_value(dataset_dict, 'contact_email'),
-            self._get_dataset_value(dataset_dict, 'maintainer'),
-            self._get_dataset_value(dataset_dict, 'maintainer_email'),
-            self._get_dataset_value(dataset_dict, 'author'),
-            self._get_dataset_value(dataset_dict, 'author_email'),
-        ]):
+        g.add((dataset_ref, DCT.publisher, publisher_details))
 
-            contact_uri = self._get_dataset_value(dataset_dict, 'contact_uri')
-            if contact_uri:
-                contact_details = URIRef(contact_uri)
-            else:
-                contact_details = BNode()
 
-            g.add((contact_details, RDF.type, VCARD.Organization))
-            g.add((dataset_ref, DCAT.contactPoint, contact_details))
+        #License
+        license_url =  dataset_dict.get('license_url')
+        g.add((dataset_ref, DCT.license, URIRef(license_url)))
 
-            items = [
-                ('contact_name', VCARD.fn, ['maintainer', 'author'], Literal),
-                ('contact_email', VCARD.hasEmail, ['maintainer_email',
-                                                   'author_email'], Literal),
-            ]
+        #Spatial
+        #TODO Revisar los namespaces
+        spatial = BNode()
+        
+        spatial_title = 'aragon'
+        spatial_comunidad = 'aragon2'
+        spatial_url = 'http://opendata.aragon.es/recurso/territorio/ComunidadAutonoma/Aragon?api_key=e103dc13eb276ad734e680f5855f20c6'
 
-            self._add_triples_from_dict(dataset_dict, contact_details, items)
+        g.add((spatial, DCT.title, Literal(spatial_title,lang='es')))
+        g.add((spatial, ARAGODEF.ComunidadAutonoma, Literal(spatial_comunidad,lang='es')))
+        g.add((spatial, RDF.resource, Literal(spatial_url)))
+        g.add((dataset_ref, DCT.spatial, spatial))
 
-        # Publisher
-        if any([
-            self._get_dataset_value(dataset_dict, 'publisher_uri'),
-            self._get_dataset_value(dataset_dict, 'publisher_name'),
-            dataset_dict.get('organization'),
-        ]):
-
-            publisher_uri = publisher_uri_from_dataset_dict(dataset_dict)
-            if publisher_uri:
-                publisher_details = URIRef(publisher_uri)
-            else:
-                # No organization nor publisher_uri
-                publisher_details = BNode()
-
-            g.add((publisher_details, RDF.type, FOAF.Organization))
-            g.add((dataset_ref, DCT.publisher, publisher_details))
-
-            publisher_name = self._get_dataset_value(dataset_dict, 'publisher_name')
-            if not publisher_name and dataset_dict.get('organization'):
-                publisher_name = dataset_dict['organization']['title']
-
-            g.add((publisher_details, FOAF.name, Literal(publisher_name)))
-            # TODO: It would make sense to fallback these to organization
-            # fields but they are not in the default schema and the
-            # `organization` object in the dataset_dict does not include
-            # custom fields
-            items = [
-                ('publisher_email', FOAF.mbox, None, Literal),
-                ('publisher_url', FOAF.homepage, None, URIRef),
-                ('publisher_type', DCT.type, None, Literal),
-            ]
-
-            self._add_triples_from_dict(dataset_dict, publisher_details, items)
-
-        # Temporal
-        start = self._get_dataset_value(dataset_dict, 'temporal_start')
-        end = self._get_dataset_value(dataset_dict, 'temporal_end')
+        #Temporal
+        #TODO Introduce nodos Description y no utiliza los prefijos para los namespaces custom
+        start = self._get_dataset_value(dataset_dict, 'TemporalFrom')
+        end = self._get_dataset_value(dataset_dict, 'TemporalUntil')
         if start or end:
             temporal_extent = BNode()
+            timeinterval_extent = BNode()
+            
 
-            g.add((temporal_extent, RDF.type, DCT.PeriodOfTime))
+            g.add((temporal_extent, TIME.Interval, timeinterval_extent))
+            g.add((timeinterval_extent, RDF.type, URIRef('http://purl.org/dc/terms/PeriodOfTime')))
+            
             if start:
-                self._add_date_triple(temporal_extent, SCHEMA.startDate, start)
+                hasBeginning = BNode()
+                g.add((timeinterval_extent, TIME.hasBeginning, hasBeginning))
+
+                instant_begin = BNode()
+                g.add((hasBeginning, TIME.Instant, instant_begin))
+                g.add((instant_begin, TIME.inXSDDate, Literal(start,datatype='http://www.w3.org/2001/XMLSchema#date')))
             if end:
-                self._add_date_triple(temporal_extent, SCHEMA.endDate, end)
+                hasEnd = BNode()
+                g.add((timeinterval_extent, TIME.hasEnd, hasEnd))
+
+                instant_end = BNode()
+                g.add((hasEnd, TIME.Instant, instant_end))
+                g.add((instant_end, TIME.inXSDDate, Literal(end,datatype='http://www.w3.org/2001/XMLSchema#date')))
+
             g.add((dataset_ref, DCT.temporal, temporal_extent))
 
-        # Spatial
-        spatial_uri = self._get_dataset_value(dataset_dict, 'spatial_uri')
-        spatial_text = self._get_dataset_value(dataset_dict, 'spatial_text')
-        spatial_geom = self._get_dataset_value(dataset_dict, 'spatial')
+        #Incluimos el extra Granularity
+        granularity = self._get_dataset_value(dataset_dict, 'Granularity')
+        if granularity:
+            ref_granularity_extent = BNode()
 
-        if spatial_uri or spatial_text or spatial_geom:
-            if spatial_uri:
-                spatial_ref = URIRef(spatial_uri)
-            else:
-                spatial_ref = BNode()
+            g.add((ref_granularity_extent, RDFS.label, Literal('Granularity',lang='es')))
+            g.add((ref_granularity_extent, RDFS.value, Literal(granularity,lang='es')))
 
-            g.add((spatial_ref, RDF.type, DCT.Location))
-            g.add((dataset_ref, DCT.spatial, spatial_ref))
+            g.add((dataset_ref, DCT.references, ref_granularity_extent))
 
-            if spatial_text:
-                g.add((spatial_ref, SKOS.prefLabel, Literal(spatial_text)))
+        #incluimos el extra Diccionario de datos y Data Dictionary URL0
+        data_dictionary = self._get_dataset_value(dataset_dict, 'Data Dictionary')
+        data_dictionary_url = self._get_dataset_value(dataset_dict, 'Data Dictionary URL0')
+        if data_dictionary and data_dictionary_url:
+            ref_dictionary_extent = BNode()
 
-            if spatial_geom:
-                # GeoJSON
-                g.add((spatial_ref,
-                       LOCN.geometry,
-                       Literal(spatial_geom, datatype=GEOJSON_IMT)))
-                # WKT, because GeoDCAT-AP says so
-                try:
-                    g.add((spatial_ref,
-                           LOCN.geometry,
-                           Literal(wkt.dumps(json.loads(spatial_geom),
-                                             decimals=4),
-                                   datatype=GSP.wktLiteral)))
-                except (TypeError, ValueError, InvalidGeoJSONException):
-                    pass
+            g.add((ref_dictionary_extent, RDFS.label, Literal('Data Dictionary',lang='es')))
+            g.add((ref_dictionary_extent, RDFS.value, Literal(data_dictionary,lang='es')))
+            g.add((ref_dictionary_extent, RDF.resource, Literal(data_dictionary_url)))
+
+            g.add((dataset_ref, DCT.references, ref_dictionary_extent))
+        
 
         # Resources
         for resource_dict in dataset_dict.get('resources', []):
 
             distribution = URIRef(resource_uri(resource_dict))
 
-            g.add((dataset_ref, DCAT.distribution, distribution))
+            g.add((dataset_ref, DCAT.Distribution, distribution))
 
-            g.add((distribution, RDF.type, DCAT.Distribution))
+            #Identifier
+            identifier = resource_uri(resource_dict)
+            g.add((distribution, DCT.identifier, Literal(identifier,datatype='http://www.w3.org/2001/XMLSchema#anyURI')))
 
-            #  Simple values
-            items = [
-                ('name', DCT.title, None, Literal),
-                ('description', DCT.description, None, Literal),
-                ('status', ADMS.status, None, Literal),
-                ('rights', DCT.rights, None, Literal),
-                ('license', DCT.license, None, Literal),
-            ]
+            #title
+            title = resource_dict.get('name')
+            g.add((distribution, DCT.title, Literal(title,lang='es')))
 
-            self._add_triples_from_dict(resource_dict, distribution, items)
+            #Description
+            description = resource_dict.get('description')
+            g.add((distribution, DCT.description, Literal(description,lang='es')))
 
-            #  Lists
-            items = [
-                ('documentation', FOAF.page, None, Literal),
-                ('language', DCT.language, None, Literal),
-                ('conforms_to', DCT.conformsTo, None, Literal),
-            ]
-            self._add_list_triples_from_dict(resource_dict, distribution, items)
-
-            # Format
-            if '/' in resource_dict.get('format', ''):
-                g.add((distribution, DCAT.mediaType,
-                       Literal(resource_dict['format'])))
-            else:
-                if resource_dict.get('format'):
-                    g.add((distribution, DCT['format'],
-                           Literal(resource_dict['format'])))
-
-                if resource_dict.get('mimetype'):
-                    g.add((distribution, DCAT.mediaType,
-                           Literal(resource_dict['mimetype'])))
-
-            # URL
+            #accessUrl
+             # URL
             url = resource_dict.get('url')
             download_url = resource_dict.get('download_url')
             if download_url:
-                g.add((distribution, DCAT.downloadURL, URIRef(download_url)))
+                g.add((distribution, DCAT.downloadURL, Literal(download_url,datatype='http://www.w3.org/2001/XMLSchema#anyURI')))
             if (url and not download_url) or (url and url != download_url):
-                g.add((distribution, DCAT.accessURL, URIRef(url)))
+                g.add((distribution, DCAT.accessURL, Literal(url,datatype='http://www.w3.org/2001/XMLSchema#anyURI')))
 
-            # Dates
-            items = [
-                ('issued', DCT.issued, None, Literal),
-                ('modified', DCT.modified, None, Literal),
-            ]
+            #format
+            format_res = resource_dict.get('format')
+            mimetype_inner_res = resource_dict.get('mimetype_inner')
+            if format_res:
 
-            self._add_date_triples_from_dict(resource_dict, distribution, items)
+                format_extent = BNode()
+                mediatype_extent = BNode()
 
-            # Numbers
-            if resource_dict.get('size'):
-                try:
-                    g.add((distribution, DCAT.byteSize,
-                           Literal(float(resource_dict['size']),
-                                   datatype=XSD.decimal)))
-                except (ValueError, TypeError):
-                    g.add((distribution, DCAT.byteSize,
-                           Literal(resource_dict['size'])))
-            # Checksum
-            if resource_dict.get('hash'):
-                checksum = BNode()
-                g.add((checksum, SPDX.checksumValue,
-                       Literal(resource_dict['hash'],
-                               datatype=XSD.hexBinary)))
+                g.add((mediatype_extent, RDFS.value, Literal(mimetype_inner_res)))
+                g.add((mediatype_extent, RDFS.label, Literal(format_res)))
 
-                if resource_dict.get('hash_algorithm'):
-                    if resource_dict['hash_algorithm'].startswith('http'):
-                        g.add((checksum, SPDX.algorithm,
-                               URIRef(resource_dict['hash_algorithm'])))
-                    else:
-                        g.add((checksum, SPDX.algorithm,
-                               Literal(resource_dict['hash_algorithm'])))
-                g.add((distribution, SPDX.checksum, checksum))
+                g.add((format_extent, DCT.MediaType, mediatype_extent))
+                g.add((distribution, DCT['format'], format_extent))
+                
 
+        
     def graph_from_catalog(self, catalog_dict, catalog_ref):
 
         g = self.g
 
+        log.debug('Generando RDF IAEST')
         for prefix, namespace in namespaces.iteritems():
             g.bind(prefix, namespace)
 
