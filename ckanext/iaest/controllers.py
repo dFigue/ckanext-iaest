@@ -12,6 +12,13 @@ from ckan.controllers.home import HomeController
 
 from ckanext.iaest.utils import CONTENT_TYPES, parse_accept_header
 
+from genshi.template import MarkupTemplate
+from genshi.template.text import NewTextTemplate
+
+import ckan.lib.base as base
+render = base.render
+
+
 log = logging.getLogger(__name__)
 
 def check_access_header():
@@ -85,6 +92,31 @@ class DCATController(BaseController):
         toolkit.response.headers['Content-Length'] = len(content)
 
         return content
+
+    def federador(self):
+        
+        log.debug('Leyendo catalog')
+        data_dict = {
+            'page': toolkit.request.params.get('page'),
+            'modified_since': toolkit.request.params.get('modified_since'),
+            
+        }
+
+       
+        try:
+            log.debug('Obteniendo datasets para el federador')
+            dataset_dict = toolkit.get_action('iaest_federador')({}, data_dict)
+            log.debug('Creando extra_vars')
+            c = {'c':{'pkg':dataset_dict}}
+            log.debug('Creando c %s', c)
+            
+            toolkit.response.headers['Content-Type'] = 'application/rdf+xml;charset=UTF-8'
+            loader_render = NewTextTemplate("application/rdf+xml; charset=utf-8", True, 'rdf') 
+            return render('package/federador.rdf', extra_vars=c,loader=loader_render)
+
+
+        except toolkit.ValidationError, e:
+            toolkit.abort(409, str(e))
 
 
 

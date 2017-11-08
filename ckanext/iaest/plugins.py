@@ -13,6 +13,7 @@ from ckanext.iaest.logic import (iaest_dataset_show,
                                 iaest_catalog_search,
                                 iaest_datasets_list,
                                 iaest_auth,
+                                iaest_federador,
                                 )
 from ckanext.iaest import utils
 
@@ -64,17 +65,11 @@ class IAESTPlugin(p.SingletonPlugin, DefaultTranslation):
         _map.connect('iaest_dataset', '/dataset/iaest/{_id}.{_format}',
                      controller=controller, action='read_dataset',
                      requirements={'_format': 'xml|rdf|n3|ttl|jsonld'})
+        
+        _map.connect('federador_rdf', '/federador.rdf',
+                     controller=controller, action='federador')
 
-        if p.toolkit.asbool(config.get(ENABLE_CONTENT_NEGOTIATION_CONFIG)):
-
-            _map.connect('home', '/', controller=controller,
-                         action='read_catalog')
-
-            _map.connect('add dataset', '/dataset/new', controller='package', action='new')
-            _map.connect('dataset_read', '/dataset/{_id}',
-                         controller=controller, action='read_dataset',
-                         ckan_icon='sitemap')
-
+       
         return _map
 
     # IActions
@@ -83,6 +78,7 @@ class IAESTPlugin(p.SingletonPlugin, DefaultTranslation):
             'iaest_dataset_show': iaest_dataset_show,
             'iaest_catalog_show':iaest_catalog_show,
             'iaest_catalog_search': iaest_catalog_search,
+            'iaest_federador':iaest_federador,
         }
 
     # IAuthFunctions
@@ -91,6 +87,7 @@ class IAESTPlugin(p.SingletonPlugin, DefaultTranslation):
             'iaest_dataset_show': iaest_auth,
             'iaest_catalog_show': iaest_auth,
             'iaest_catalog_search': iaest_auth,
+            'iaest_federador': iaest_auth
         }
 
     # IPackageController

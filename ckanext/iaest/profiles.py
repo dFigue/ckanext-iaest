@@ -986,6 +986,7 @@ class EuropeanDCATAPProfile(RDFProfile):
 
             #format
             format_res = resource_dict.get('format')
+            #TODO En el importador nos se esta rellenando el mimetype_inner
             mimetype_inner_res = resource_dict.get('mimetype_inner')
             if format_res:
 

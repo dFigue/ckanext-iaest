@@ -51,6 +51,15 @@ def iaest_catalog_show(context, data_dict):
 
     return output
 
+def iaest_federador(context, data_dict):
+    log.debug('Entrando en iaest_federador')
+    #toolkit.check_access('iaest_catalog_show', context, data_dict)
+
+    query = _search_ckan_datasets(context, data_dict)
+    dataset_dicts = query['results']
+    
+    #log.debug('Dataset_dicts: %s',dataset_dicts)
+    return dataset_dicts
 
 @toolkit.side_effect_free
 def iaest_catalog_search(context, data_dict):
@@ -212,3 +221,5 @@ def iaest_auth(context, data_dict):
     All users can access DCAT endpoints by default
     '''
     return {'success': True}
+
+       
